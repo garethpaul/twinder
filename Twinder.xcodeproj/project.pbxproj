@@ -1,0 +1,638 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5C5A6EA716115D57F3170BD1 /* libPods-Twinder.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 16C4A059D9D5535EC9F9547F /* libPods-Twinder.a */; };
+		FD21C5EA1A4E5159009E5A44 /* HEX.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD21C5E91A4E5159009E5A44 /* HEX.swift */; };
+		FD21C5F81A4E5AB8009E5A44 /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD21C5F71A4E5AB8009E5A44 /* LoginController.swift */; };
+		FD21C6011A4E5CB9009E5A44 /* TwitterKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD21C5FE1A4E5CB8009E5A44 /* TwitterKit.framework */; };
+		FD21C6021A4E5CB9009E5A44 /* TwitterKitResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = FD21C5FF1A4E5CB8009E5A44 /* TwitterKitResources.bundle */; };
+		FD21C6031A4E5CB9009E5A44 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD21C6001A4E5CB9009E5A44 /* Fabric.framework */; };
+		FD21C6061A4E6712009E5A44 /* Shuffle.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD21C6051A4E6712009E5A44 /* Shuffle.swift */; };
+		FDAC654F1A4E450600E977B3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDAC654E1A4E450600E977B3 /* AppDelegate.swift */; };
+		FDAC65511A4E450600E977B3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDAC65501A4E450600E977B3 /* ViewController.swift */; };
+		FDAC65541A4E450600E977B3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FDAC65521A4E450600E977B3 /* Main.storyboard */; };
+		FDAC65561A4E450600E977B3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FDAC65551A4E450600E977B3 /* Images.xcassets */; };
+		FDAC65591A4E450600E977B3 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = FDAC65571A4E450600E977B3 /* LaunchScreen.xib */; };
+		FDAC65651A4E450600E977B3 /* TwinderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDAC65641A4E450600E977B3 /* TwinderTests.swift */; };
+		FDAC65761A4E478300E977B3 /* Tweep.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDAC65751A4E478300E977B3 /* Tweep.swift */; };
+		FDAC65781A4E479700E977B3 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDAC65771A4E479700E977B3 /* API.swift */; };
+		FDAC657D1A4E497300E977B3 /* Picture.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDAC657C1A4E497300E977B3 /* Picture.swift */; };
+		FDAC657F1A4E4A9600E977B3 /* TweepPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDAC657E1A4E4A9600E977B3 /* TweepPickerViewController.swift */; };
+		FDAC65811A4E4C0100E977B3 /* TweepPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDAC65801A4E4C0100E977B3 /* TweepPickerView.swift */; };
+		FDC05ADE1A4F4DFF00F7F9C0 /* Store.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FDC05ADC1A4F4DFF00F7F9C0 /* Store.xcdatamodeld */; };
+		FDD24A0B1A4F52AC000F0980 /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD24A0A1A4F52AC000F0980 /* AppInfo.swift */; };
+		FDD24A0D1A4F55F9000F0980 /* FavTweets.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD24A0C1A4F55F9000F0980 /* FavTweets.swift */; };
+		FDD24A0F1A4F5A32000F0980 /* TableController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD24A0E1A4F5A32000F0980 /* TableController.swift */; };
+		FDD24A131A4F6C29000F0980 /* TweepCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD24A121A4F6C29000F0980 /* TweepCell.swift */; };
+		FDD24A171A4F9710000F0980 /* DeepLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD24A161A4F9710000F0980 /* DeepLinks.swift */; };
+		FDE6DB221A50ADF000CABA17 /* PersonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDE6DB211A50ADF000CABA17 /* PersonController.swift */; };
+		FDE6DB241A50AEA100CABA17 /* Resizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDE6DB231A50AEA100CABA17 /* Resizer.swift */; };
+		FDE6DB261A50AEB700CABA17 /* TweepPicture.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDE6DB251A50AEB700CABA17 /* TweepPicture.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FDAC655F1A4E450600E977B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FDAC65411A4E450600E977B3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FDAC65481A4E450600E977B3;
+			remoteInfo = Twinder;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		16C4A059D9D5535EC9F9547F /* libPods-Twinder.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Twinder.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7EACCC42911BBEA99BAE388E /* Pods-Twinder.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Twinder.release.xcconfig"; path = "Pods/Target Support Files/Pods-Twinder/Pods-Twinder.release.xcconfig"; sourceTree = "<group>"; };
+		DB94292C5FD25B521E3D3E10 /* Pods-Twinder.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Twinder.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Twinder/Pods-Twinder.debug.xcconfig"; sourceTree = "<group>"; };
+		FD21C5E91A4E5159009E5A44 /* HEX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HEX.swift; sourceTree = "<group>"; };
+		FD21C5F71A4E5AB8009E5A44 /* LoginController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
+		FD21C5FE1A4E5CB8009E5A44 /* TwitterKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = TwitterKit.framework; sourceTree = "<group>"; };
+		FD21C5FF1A4E5CB8009E5A44 /* TwitterKitResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = TwitterKitResources.bundle; path = TwitterKit.framework/Versions/A/Resources/TwitterKitResources.bundle; sourceTree = "<group>"; };
+		FD21C6001A4E5CB9009E5A44 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
+		FD21C6051A4E6712009E5A44 /* Shuffle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Shuffle.swift; sourceTree = "<group>"; };
+		FDAC65491A4E450600E977B3 /* Twinder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Twinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FDAC654D1A4E450600E977B3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FDAC654E1A4E450600E977B3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		FDAC65501A4E450600E977B3 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		FDAC65531A4E450600E977B3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		FDAC65551A4E450600E977B3 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		FDAC65581A4E450600E977B3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		FDAC655E1A4E450600E977B3 /* TwinderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TwinderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FDAC65631A4E450600E977B3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FDAC65641A4E450600E977B3 /* TwinderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwinderTests.swift; sourceTree = "<group>"; };
+		FDAC656E1A4E45DE00E977B3 /* BridgeHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgeHeader.h; sourceTree = "<group>"; };
+		FDAC65751A4E478300E977B3 /* Tweep.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tweep.swift; sourceTree = "<group>"; };
+		FDAC65771A4E479700E977B3 /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		FDAC657C1A4E497300E977B3 /* Picture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Picture.swift; sourceTree = "<group>"; };
+		FDAC657E1A4E4A9600E977B3 /* TweepPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TweepPickerViewController.swift; sourceTree = "<group>"; };
+		FDAC65801A4E4C0100E977B3 /* TweepPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TweepPickerView.swift; sourceTree = "<group>"; };
+		FDC05ADD1A4F4DFF00F7F9C0 /* Store.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Store.xcdatamodel; sourceTree = "<group>"; };
+		FDD24A0A1A4F52AC000F0980 /* AppInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
+		FDD24A0C1A4F55F9000F0980 /* FavTweets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavTweets.swift; sourceTree = "<group>"; };
+		FDD24A0E1A4F5A32000F0980 /* TableController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableController.swift; sourceTree = "<group>"; };
+		FDD24A121A4F6C29000F0980 /* TweepCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TweepCell.swift; sourceTree = "<group>"; };
+		FDD24A161A4F9710000F0980 /* DeepLinks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeepLinks.swift; sourceTree = "<group>"; };
+		FDE6DB211A50ADF000CABA17 /* PersonController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonController.swift; sourceTree = "<group>"; };
+		FDE6DB231A50AEA100CABA17 /* Resizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Resizer.swift; sourceTree = "<group>"; };
+		FDE6DB251A50AEB700CABA17 /* TweepPicture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TweepPicture.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FDAC65461A4E450600E977B3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5C5A6EA716115D57F3170BD1 /* libPods-Twinder.a in Frameworks */,
+				FD21C6011A4E5CB9009E5A44 /* TwitterKit.framework in Frameworks */,
+				FD21C6031A4E5CB9009E5A44 /* Fabric.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FDAC655B1A4E450600E977B3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		41908F7DDABBD13DBDA83202 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				16C4A059D9D5535EC9F9547F /* libPods-Twinder.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4A0D1DC45CEC9164EE9175E4 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				DB94292C5FD25B521E3D3E10 /* Pods-Twinder.debug.xcconfig */,
+				7EACCC42911BBEA99BAE388E /* Pods-Twinder.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		FDAC65401A4E450600E977B3 = {
+			isa = PBXGroup;
+			children = (
+				FD21C5FE1A4E5CB8009E5A44 /* TwitterKit.framework */,
+				FD21C5FF1A4E5CB8009E5A44 /* TwitterKitResources.bundle */,
+				FD21C6001A4E5CB9009E5A44 /* Fabric.framework */,
+				FDAC654B1A4E450600E977B3 /* Twinder */,
+				FDAC65611A4E450600E977B3 /* TwinderTests */,
+				FDAC654A1A4E450600E977B3 /* Products */,
+				4A0D1DC45CEC9164EE9175E4 /* Pods */,
+				41908F7DDABBD13DBDA83202 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		FDAC654A1A4E450600E977B3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FDAC65491A4E450600E977B3 /* Twinder.app */,
+				FDAC655E1A4E450600E977B3 /* TwinderTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FDAC654B1A4E450600E977B3 /* Twinder */ = {
+			isa = PBXGroup;
+			children = (
+				FDAC654E1A4E450600E977B3 /* AppDelegate.swift */,
+				FDAC657B1A4E496900E977B3 /* Functions */,
+				FDAC656F1A4E470E00E977B3 /* Views */,
+				FDAC656E1A4E45DE00E977B3 /* BridgeHeader.h */,
+				FDAC65721A4E472900E977B3 /* Controllers */,
+				FDAC65521A4E450600E977B3 /* Main.storyboard */,
+				FDAC65551A4E450600E977B3 /* Images.xcassets */,
+				FDC05ADC1A4F4DFF00F7F9C0 /* Store.xcdatamodeld */,
+				FDAC65701A4E471300E977B3 /* Models */,
+				FDAC65571A4E450600E977B3 /* LaunchScreen.xib */,
+				FDAC654C1A4E450600E977B3 /* Supporting Files */,
+			);
+			path = Twinder;
+			sourceTree = "<group>";
+		};
+		FDAC654C1A4E450600E977B3 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				FDAC654D1A4E450600E977B3 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		FDAC65611A4E450600E977B3 /* TwinderTests */ = {
+			isa = PBXGroup;
+			children = (
+				FDAC65641A4E450600E977B3 /* TwinderTests.swift */,
+				FDAC65621A4E450600E977B3 /* Supporting Files */,
+			);
+			path = TwinderTests;
+			sourceTree = "<group>";
+		};
+		FDAC65621A4E450600E977B3 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				FDAC65631A4E450600E977B3 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		FDAC656F1A4E470E00E977B3 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				FDD24A121A4F6C29000F0980 /* TweepCell.swift */,
+				FDAC65801A4E4C0100E977B3 /* TweepPickerView.swift */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		FDAC65701A4E471300E977B3 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				FDD24A0C1A4F55F9000F0980 /* FavTweets.swift */,
+				FDD24A0A1A4F52AC000F0980 /* AppInfo.swift */,
+				FDAC65751A4E478300E977B3 /* Tweep.swift */,
+				FDAC65771A4E479700E977B3 /* API.swift */,
+				FDE6DB251A50AEB700CABA17 /* TweepPicture.swift */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		FDAC65721A4E472900E977B3 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				FDAC65501A4E450600E977B3 /* ViewController.swift */,
+				FD21C5F71A4E5AB8009E5A44 /* LoginController.swift */,
+				FDE6DB211A50ADF000CABA17 /* PersonController.swift */,
+				FDD24A0E1A4F5A32000F0980 /* TableController.swift */,
+				FDAC657E1A4E4A9600E977B3 /* TweepPickerViewController.swift */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		FDAC657B1A4E496900E977B3 /* Functions */ = {
+			isa = PBXGroup;
+			children = (
+				FDAC657C1A4E497300E977B3 /* Picture.swift */,
+				FDE6DB231A50AEA100CABA17 /* Resizer.swift */,
+				FDD24A161A4F9710000F0980 /* DeepLinks.swift */,
+				FD21C6051A4E6712009E5A44 /* Shuffle.swift */,
+				FD21C5E91A4E5159009E5A44 /* HEX.swift */,
+			);
+			name = Functions;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FDAC65481A4E450600E977B3 /* Twinder */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FDAC65681A4E450600E977B3 /* Build configuration list for PBXNativeTarget "Twinder" */;
+			buildPhases = (
+				DE4BB1FF9A0D5CCD520427CD /* Check Pods Manifest.lock */,
+				FDAC65451A4E450600E977B3 /* Sources */,
+				FDAC65461A4E450600E977B3 /* Frameworks */,
+				FDAC65471A4E450600E977B3 /* Resources */,
+				D5DDAED0B330314CE9F75C77 /* Copy Pods Resources */,
+				FD21C6041A4E5CDA009E5A44 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Twinder;
+			productName = Twinder;
+			productReference = FDAC65491A4E450600E977B3 /* Twinder.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FDAC655D1A4E450600E977B3 /* TwinderTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FDAC656B1A4E450600E977B3 /* Build configuration list for PBXNativeTarget "TwinderTests" */;
+			buildPhases = (
+				FDAC655A1A4E450600E977B3 /* Sources */,
+				FDAC655B1A4E450600E977B3 /* Frameworks */,
+				FDAC655C1A4E450600E977B3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FDAC65601A4E450600E977B3 /* PBXTargetDependency */,
+			);
+			name = TwinderTests;
+			productName = TwinderTests;
+			productReference = FDAC655E1A4E450600E977B3 /* TwinderTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FDAC65411A4E450600E977B3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0620;
+				ORGANIZATIONNAME = GarethPaul;
+				TargetAttributes = {
+					FDAC65481A4E450600E977B3 = {
+						CreatedOnToolsVersion = 6.2;
+					};
+					FDAC655D1A4E450600E977B3 = {
+						CreatedOnToolsVersion = 6.2;
+						TestTargetID = FDAC65481A4E450600E977B3;
+					};
+				};
+			};
+			buildConfigurationList = FDAC65441A4E450600E977B3 /* Build configuration list for PBXProject "Twinder" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FDAC65401A4E450600E977B3;
+			productRefGroup = FDAC654A1A4E450600E977B3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FDAC65481A4E450600E977B3 /* Twinder */,
+				FDAC655D1A4E450600E977B3 /* TwinderTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FDAC65471A4E450600E977B3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FD21C6021A4E5CB9009E5A44 /* TwitterKitResources.bundle in Resources */,
+				FDAC65541A4E450600E977B3 /* Main.storyboard in Resources */,
+				FDAC65591A4E450600E977B3 /* LaunchScreen.xib in Resources */,
+				FDAC65561A4E450600E977B3 /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FDAC655C1A4E450600E977B3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D5DDAED0B330314CE9F75C77 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Twinder/Pods-Twinder-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DE4BB1FF9A0D5CCD520427CD /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		FD21C6041A4E5CDA009E5A44 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "./Fabric.framework/run abb870ac2c6cd77fc0a3ee166f786a86748f4eb9 47d331d25396fd56e08c5c5891c16a003ba5647e584bf8fc07feb0e8ae92ab92";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FDAC65451A4E450600E977B3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FDD24A0F1A4F5A32000F0980 /* TableController.swift in Sources */,
+				FDAC65761A4E478300E977B3 /* Tweep.swift in Sources */,
+				FD21C5EA1A4E5159009E5A44 /* HEX.swift in Sources */,
+				FDAC657D1A4E497300E977B3 /* Picture.swift in Sources */,
+				FDAC657F1A4E4A9600E977B3 /* TweepPickerViewController.swift in Sources */,
+				FD21C5F81A4E5AB8009E5A44 /* LoginController.swift in Sources */,
+				FDD24A0B1A4F52AC000F0980 /* AppInfo.swift in Sources */,
+				FDC05ADE1A4F4DFF00F7F9C0 /* Store.xcdatamodeld in Sources */,
+				FDE6DB241A50AEA100CABA17 /* Resizer.swift in Sources */,
+				FD21C6061A4E6712009E5A44 /* Shuffle.swift in Sources */,
+				FDD24A171A4F9710000F0980 /* DeepLinks.swift in Sources */,
+				FDE6DB221A50ADF000CABA17 /* PersonController.swift in Sources */,
+				FDAC65811A4E4C0100E977B3 /* TweepPickerView.swift in Sources */,
+				FDE6DB261A50AEB700CABA17 /* TweepPicture.swift in Sources */,
+				FDAC65511A4E450600E977B3 /* ViewController.swift in Sources */,
+				FDAC65781A4E479700E977B3 /* API.swift in Sources */,
+				FDD24A0D1A4F55F9000F0980 /* FavTweets.swift in Sources */,
+				FDAC654F1A4E450600E977B3 /* AppDelegate.swift in Sources */,
+				FDD24A131A4F6C29000F0980 /* TweepCell.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FDAC655A1A4E450600E977B3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FDAC65651A4E450600E977B3 /* TwinderTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FDAC65601A4E450600E977B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FDAC65481A4E450600E977B3 /* Twinder */;
+			targetProxy = FDAC655F1A4E450600E977B3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		FDAC65521A4E450600E977B3 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FDAC65531A4E450600E977B3 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		FDAC65571A4E450600E977B3 /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FDAC65581A4E450600E977B3 /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		FDAC65661A4E450600E977B3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FDAC65671A4E450600E977B3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		FDAC65691A4E450600E977B3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DB94292C5FD25B521E3D3E10 /* Pods-Twinder.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				INFOPLIST_FILE = Twinder/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = /Users/gjones/workspace/github/Twinder/Twinder/BridgeHeader.h;
+			};
+			name = Debug;
+		};
+		FDAC656A1A4E450600E977B3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7EACCC42911BBEA99BAE388E /* Pods-Twinder.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				INFOPLIST_FILE = Twinder/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = /Users/gjones/workspace/github/Twinder/Twinder/BridgeHeader.h;
+			};
+			name = Release;
+		};
+		FDAC656C1A4E450600E977B3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = TwinderTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Twinder.app/Twinder";
+			};
+			name = Debug;
+		};
+		FDAC656D1A4E450600E977B3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = TwinderTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Twinder.app/Twinder";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FDAC65441A4E450600E977B3 /* Build configuration list for PBXProject "Twinder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FDAC65661A4E450600E977B3 /* Debug */,
+				FDAC65671A4E450600E977B3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FDAC65681A4E450600E977B3 /* Build configuration list for PBXNativeTarget "Twinder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FDAC65691A4E450600E977B3 /* Debug */,
+				FDAC656A1A4E450600E977B3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FDAC656B1A4E450600E977B3 /* Build configuration list for PBXNativeTarget "TwinderTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FDAC656C1A4E450600E977B3 /* Debug */,
+				FDAC656D1A4E450600E977B3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		FDC05ADC1A4F4DFF00F7F9C0 /* Store.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				FDC05ADD1A4F4DFF00F7F9C0 /* Store.xcdatamodel */,
+			);
+			currentVersion = FDC05ADD1A4F4DFF00F7F9C0 /* Store.xcdatamodel */;
+			path = Store.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = FDAC65411A4E450600E977B3 /* Project object */;
+}
