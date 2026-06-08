@@ -18,12 +18,13 @@ Priority:
 - Keep Fabric/TwitterKit setup documented as legacy
 - Store saved profiles locally unless a backend is explicitly added
 - Avoid committing API keys, tokens, or captured profile datasets
+- Guard Twitter API JSON parsing before using profile-image data
 
 Next priorities:
 
 - Add setup notes for Xcode, CocoaPods, and legacy TwitterKit requirements
 - Document current API limitations before any revival work
-- Add tests or manual verification notes for like/skip persistence
+- Add broader tests or manual verification notes for like/skip persistence
 - Modernize Swift in a dedicated compatibility pass
 
 Contribution rules:
