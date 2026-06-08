@@ -64,10 +64,15 @@ class APIClient {
                         options: nil,
                         error: &jsonError)
 
-                    if let tweets = json! as? JSONArray {
-                        let tweet = tweets[0]["id_str"] as String!
-                        println(tweet)
-                        completion(result: tweet)
+                    if let tweets = json as? JSONArray {
+                        if tweets.count > 0 {
+                            if let tweetData = tweets[0] as? JSONDictionary {
+                                if let tweet = tweetData["id_str"] as? String {
+                                    println(tweet)
+                                    completion(result: tweet)
+                                }
+                            }
+                        }
                     }
 
                 }
@@ -123,16 +128,22 @@ class APIClient {
                             var tweetArray = Array<Tweep>()
 
                             // Iterate through JSON response and append the values to the TweetArray
-                            if let tweeps = json!["users"] as? JSONArray {
-                                for tweep in tweeps {
-                                    let screen_name = tweep["screen_name"] as String!
-                                    let name = tweep["name"] as String!
-                                    let image = tweep["profile_image_url"] as String!
-                                    let highimage = image.stringByReplacingOccurrencesOfString("_normal", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
-                                        //println(image)
-                                    tweetArray.append(Tweep(name: name, image: highimage, screen_name: screen_name))
+                            if let jsonObject = json as? JSONDictionary {
+                                if let tweeps = jsonObject["users"] as? JSONArray {
+                                    for tweep in tweeps {
+                                        if let tweepData = tweep as? JSONDictionary {
+                                            if let screen_name = tweepData["screen_name"] as? String {
+                                                if let name = tweepData["name"] as? String {
+                                                    if let image = tweepData["profile_image_url"] as? String {
+                                                        let highimage = image.stringByReplacingOccurrencesOfString("_normal", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+                                                        //println(image)
+                                                        tweetArray.append(Tweep(name: name, image: highimage, screen_name: screen_name))
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
-
                             }
                             completion(result: tweetArray)
                         }

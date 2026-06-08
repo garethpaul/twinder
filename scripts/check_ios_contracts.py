@@ -64,11 +64,24 @@ def check_tweep_picture_json_guard():
     require("if let profileImageURL" in source, "TweepPicture must validate profile image URL presence")
 
 
+def check_api_json_guards():
+    source = read_text("Twinder/API.swift")
+    require("json!" not in source, "API.swift must not force-unwrap parsed JSON")
+    require("tweets.count > 0" in source, "timeline parsing must check for at least one tweet")
+    require("if let jsonObject = json as? JSONDictionary" in source, "friends-list parsing must validate JSON dictionary shape")
+    require("if let tweepData = tweep as? JSONDictionary" in source, "friends-list parsing must validate each user record")
+    require(
+        'if let image = tweepData["profile_image_url"] as? String',
+        "friends-list parsing must validate profile image URL presence",
+    )
+
+
 def main():
     checks = [
         check_project_files_parse,
         check_pod_lock_integrity,
         check_tweep_picture_json_guard,
+        check_api_json_guards,
     ]
     try:
         for check in checks:

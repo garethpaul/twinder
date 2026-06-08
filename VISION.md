@@ -18,7 +18,7 @@ Priority:
 - Keep Fabric/TwitterKit setup documented as legacy
 - Store saved profiles locally unless a backend is explicitly added
 - Avoid committing API keys, tokens, or captured profile datasets
-- Guard Twitter API JSON parsing before using profile-image data
+- Guard Twitter API JSON parsing before using tweet IDs or profile-image data
 
 Next priorities:
 
