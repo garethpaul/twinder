@@ -45,3 +45,6 @@ saved profiles without consent.
 - Captured user-profile datasets
 - Hidden analytics or profile upload
 - SDK rewrites without preserving the sample flow
+
+This list is a roadmap guardrail, not a permanent rule.
+Strong user demand and strong technical rationale can change it.
