@@ -1,5 +1,8 @@
 # twinder
 
+<!-- README-OVERVIEW-IMAGE -->
+![Project overview](docs/readme-overview.svg)
+
 ## Overview
 
 `garethpaul/twinder` is an Apple platform application or Objective-C/Swift sample. A simple application that showcases Fabric + Cocoapods
@@ -82,4 +85,3 @@ Keep changes small and tied to the project that is already present in this repos
 Prior README summary:
 
 > twinder <!-- README-OVERVIEW-IMAGE --> twinder ======= A simple application that showcases Fabric + Cocoapods and simple tweet swiping 1. Download Fabric.app via Fabric.io 2. Enable the TwitterKit by walking through the various steps. 3. Ensure that you have some keys and secrets in Fabric under your Info.plist
-
