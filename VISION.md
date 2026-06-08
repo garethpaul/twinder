@@ -35,6 +35,11 @@ Contribution rules:
 
 ## Security And Responsible Use
 
+Canonical security policy and reporting:
+
+- [`SECURITY.md`](SECURITY.md)
+
+
 The app handles social identities, profile images, and saved preferences.
 Changes should avoid hidden profile collection, token exposure, or upload of
 saved profiles without consent.
