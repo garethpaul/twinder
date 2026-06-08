@@ -39,7 +39,7 @@ The app handles social identities, profile images, and saved preferences.
 Changes should avoid hidden profile collection, token exposure, or upload of
 saved profiles without consent.
 
-## What We Will Not Merge For Now
+## What We Will Not Merge (For Now)
 
 - Checked-in Twitter or Fabric credentials
 - Captured user-profile datasets
