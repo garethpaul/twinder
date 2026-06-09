@@ -12,6 +12,8 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 DOCS_PLANS = ROOT / "docs/plans"
 CANONICAL_PLAN = DOCS_PLANS / "2026-06-08-twinder-baseline.md"
+TWEEP_PICTURE_FAILURE_PLAN = DOCS_PLANS / "2026-06-09-tweep-picture-failure-completion.md"
+INITIAL_CARD_PLAN = DOCS_PLANS / "2026-06-09-initial-card-data-guards.md"
 
 
 def fail(message):
@@ -65,6 +67,28 @@ def check_tweep_picture_json_guard():
     require("profile_image_url!" not in source, "TweepPicture must not force-unwrap profile image URLs")
     require("if let jsonObject = json as? JSONDictionary" in source, "TweepPicture must validate JSON dictionary shape")
     require("if let profileImageURL" in source, "TweepPicture must validate profile image URL presence")
+
+
+def check_tweep_picture_failure_completion():
+    source = read_text("Twinder/TweepPicture.swift")
+    person_controller = read_text("Twinder/PersonController.swift")
+
+    require(
+        "connectionError == nil && data != nil" in source,
+        "TweepPicture must verify response data exists before JSON parsing",
+    )
+    require(
+        source.count('completion(result: "")') >= 4,
+        "TweepPicture must complete missing-data, malformed-JSON, transport, and request failures",
+    )
+    require(
+        "println(" not in source and "NSLog(" not in source,
+        "TweepPicture must not log Twitter API errors or profile lookup details",
+    )
+    require(
+        "if result.isEmpty" in person_controller,
+        "PersonController must ignore empty TweepPicture failure completions",
+    )
 
 
 def check_api_json_guards():
@@ -203,6 +227,35 @@ def check_swipe_card_remote_data_guards():
     )
 
 
+def check_initial_card_data_guards():
+    source = read_text("Twinder/TweepPickerViewController.swift")
+
+    require(
+        "func nextTweep() -> Tweep?" in source,
+        "TweepPickerViewController must centralize guarded Tweep removal",
+    )
+    require(
+        "return self.tweeps.removeAtIndex(0)" in source,
+        "TweepPickerViewController must only remove Tweeps through nextTweep",
+    )
+    require(
+        "if let firstTweep = self.nextTweep()" in source,
+        "initial top card setup must guard the first fetched Tweep",
+    )
+    require(
+        "if let secondTweep = self.nextTweep()" in source,
+        "initial bottom card setup must guard the second fetched Tweep",
+    )
+    require(
+        "if let nextTweep = self.nextTweep()" in source,
+        "swipe replenishment must guard each next Tweep before card creation",
+    )
+    require(
+        "self.tweeps.removeAtIndex(0))" not in source,
+        "card setup must not remove Tweeps inline without the nextTweep guard",
+    )
+
+
 def check_core_data_failure_guards():
     app_delegate = read_text("Twinder/AppDelegate.swift")
 
@@ -251,6 +304,8 @@ def check_docs_plans():
     plans = sorted(DOCS_PLANS.glob("*.md"))
     require(plans, "docs/plans must contain completed maintenance plans")
     require(CANONICAL_PLAN in plans, f"{CANONICAL_PLAN.relative_to(ROOT)} must be present")
+    require(TWEEP_PICTURE_FAILURE_PLAN in plans, f"{TWEEP_PICTURE_FAILURE_PLAN.relative_to(ROOT)} must be present")
+    require(INITIAL_CARD_PLAN in plans, f"{INITIAL_CARD_PLAN.relative_to(ROOT)} must be present")
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")
@@ -263,10 +318,12 @@ def main():
         check_project_files_parse,
         check_pod_lock_integrity,
         check_tweep_picture_json_guard,
+        check_tweep_picture_failure_completion,
         check_api_json_guards,
         check_profile_image_loading_guards,
         check_person_profile_image_guards,
         check_swipe_card_remote_data_guards,
+        check_initial_card_data_guards,
         check_core_data_failure_guards,
         check_login_session_guard,
         check_docs_plans,

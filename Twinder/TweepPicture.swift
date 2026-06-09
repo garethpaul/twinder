@@ -32,7 +32,7 @@ func TweepPicture(handle: String, completion: (result: String) -> Void) {
         // Send Request to Twitter REST Api.
         Twitter.sharedInstance().APIClient.sendTwitterRequest(request) {
             (response, data, connectionError) -> Void in
-            if (connectionError == nil) {
+            if (connectionError == nil && data != nil) {
                 var jsonError : NSError?
 
                 // Setup json to contain the JSON object returned by the API
@@ -44,20 +44,20 @@ func TweepPicture(handle: String, completion: (result: String) -> Void) {
                         // Complete and return the profile image URL back.
                         completion(result: profileImageURL)
                     } else {
-                        println("Error: profile_image_url missing")
+                        completion(result: "")
                     }
                 } else {
-                    println("Error: \(jsonError)")
+                    completion(result: "")
                 }
             }
 
             else {
-                println("Error: \(connectionError)")
+                completion(result: "")
             }
         }
     }
     else {
-        println("Error: \(clientError)")
+        completion(result: "")
     }
     
 }

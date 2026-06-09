@@ -23,7 +23,10 @@ Priority:
 - Skip malformed Twitter API records instead of crashing
 - Avoid force-unwrapping remote profile image URLs or decoded image data
 - Guard current-user profile image loading before using session or image data
+- Complete current-user profile image lookup failures without logging Twitter
+  API details
 - Guard swipe-card rendering before using remote profile or tweet data
+- Guard initial swipe-card creation before removing fetched Tweeps
 - Keep failed or cancelled TwitterKit logins on the login screen without
   logging auth details
 - Avoid aborting on local Core Data store or save failures

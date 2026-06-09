@@ -69,14 +69,20 @@ class TweepPickerViewController: UIViewController, MDCSwipeToChooseDelegate {
             self.tweeps = fetchedTweeps
 
             // Setup initial card views
-            self.topCardView = self.createTweepView(self.topCardViewFrame(), tweep: self.tweeps.removeAtIndex(0))
+            if let firstTweep = self.nextTweep() {
+                self.topCardView = self.createTweepView(self.topCardViewFrame(), tweep: firstTweep)
 
-            // Append the card to the view
-            self.view.addSubview(self.topCardView)
+                // Append the card to the view
+                self.view.addSubview(self.topCardView)
+            }
 
             // Append the "bottom" card under the top card
-            self.bottomCardView = self.createTweepView(self.bottomCardViewFrame(), tweep: self.tweeps.removeAtIndex(0))
-            self.view.insertSubview(self.bottomCardView, belowSubview: self.topCardView)
+            if let secondTweep = self.nextTweep() {
+                self.bottomCardView = self.createTweepView(self.bottomCardViewFrame(), tweep: secondTweep)
+                self.view.insertSubview(self.bottomCardView, belowSubview: self.topCardView)
+            } else {
+                self.bottomCardView = UIView(frame: self.bottomCardViewFrame())
+            }
 
             // constructors see functions below...
             self.constructBackground()
@@ -137,10 +143,10 @@ class TweepPickerViewController: UIViewController, MDCSwipeToChooseDelegate {
         topCardView = bottomCardView
 
         // See if we have some tweeps to show.
-        if(self.tweeps.count > 0) {
+        if let nextTweep = self.nextTweep() {
 
             // Create a new bottom card view
-            bottomCardView = createTweepView(bottomCardViewFrame(), tweep: self.tweeps.removeAtIndex(0))
+            bottomCardView = createTweepView(bottomCardViewFrame(), tweep: nextTweep)
             bottomCardView.alpha = 0.0
 
             // Insert a new bottomCard
@@ -160,6 +166,14 @@ class TweepPickerViewController: UIViewController, MDCSwipeToChooseDelegate {
             // Bottomcard is empty
             bottomCardView = UIView()
         }
+    }
+
+    func nextTweep() -> Tweep? {
+        if self.tweeps.count == 0 {
+            return nil
+        }
+
+        return self.tweeps.removeAtIndex(0)
     }
 
     // Setup the frame for the topCard

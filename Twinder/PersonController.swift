@@ -44,6 +44,9 @@ class PersonController: UIViewController {
         // Get User's Picture
         if let session = Twitter.sharedInstance().session() {
             TweepPicture(session.userName){ (result: String) in
+                if result.isEmpty {
+                    return
+                }
                 let pic = Picture()
                 let url = result.stringByReplacingOccurrencesOfString("_normal", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
                 if let imageURL = NSURL(string: url) {

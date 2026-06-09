@@ -2,6 +2,9 @@
 
 ## 2026-06-09
 
+- Completed current-user profile image lookup failures instead of logging
+  Twitter API error details or leaving callers waiting.
+- Added static checker coverage for TweepPicture failure completions.
 - Guarded friends-list request setup before using the current Twitter session
   username and extended static checker coverage.
 - Guarded current-user profile image loading before using the Twitter session,
@@ -14,6 +17,8 @@
   image assignment, and embedded tweet rendering before using remote Twitter
   data.
 - Added static checker coverage for swipe-card remote-data guardrails.
+- Guarded initial and replenished swipe-card creation before removing fetched
+  Tweeps so short or empty API responses do not crash the card setup flow.
 
 ## 2026-06-08
 
