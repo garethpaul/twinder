@@ -18,8 +18,6 @@ class LoginController: UIViewController {
 
             if session != nil && error == nil {
                 self.performSegueWithIdentifier("ViewController", sender: self)
-            } else if let loginError = error {
-                println("Twitter login failed: \(loginError.localizedDescription)")
             }
         })
 

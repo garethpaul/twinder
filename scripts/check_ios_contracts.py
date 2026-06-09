@@ -198,6 +198,10 @@ def check_login_session_guard():
         < source.index('self.performSegueWithIdentifier("ViewController", sender: self)'),
         "LoginController must check the TwitterKit session before segueing",
     )
+    require(
+        "println(" not in source and "NSLog(" not in source,
+        "LoginController must not log TwitterKit login errors or session details",
+    )
 
 
 def check_docs_plans():

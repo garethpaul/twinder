@@ -91,7 +91,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-swipe-card-remote-data-guards.md` for swipe-card
   remote profile and tweet rendering guard coverage.
 - See `docs/plans/2026-06-09-login-session-guard.md` for TwitterKit login
-  navigation guard coverage.
+  navigation guard coverage without logging auth details.
 
 ## Contributing
 
