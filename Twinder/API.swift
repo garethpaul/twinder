@@ -91,78 +91,80 @@ class APIClient {
         // https://dev.twitter.com/rest/reference/get/search/tweets
         let RESTAPIEndpoint = "https://api.twitter.com/1.1/friends/list.json"
 
-        // setup the params for the request
-        let screen_name = Twitter.sharedInstance().session().userName
-        println(screen_name)
-        let params = ["count": "200", "include_user_entities": "true", "screen_name": screen_name]
-
-        // setup container for an error
-        var clientError : NSError?
-
         // Initialize Twitter
         Twitter.initialize()
 
-        // Send a REQUEST to Twitter using GuestAuthentication e.g. no authenticated user just the app.
-        Twitter.sharedInstance().logInWithCompletion{
-            (session, error) -> Void in
-            if (session != nil) {
+        // setup the params for the request
+        if let currentSession = Twitter.sharedInstance().session() {
+            let screen_name = currentSession.userName
+            println(screen_name)
+            let params = ["count": "200", "include_user_entities": "true", "screen_name": screen_name]
 
-                // woohoo we have a session - let's get crazy
-                let request = Twitter.sharedInstance().APIClient.URLRequestWithMethod("GET", URL:  RESTAPIEndpoint, parameters: params, error:&clientError)
+            // setup container for an error
+            var clientError : NSError?
 
-                // if the request is ready to rock and roll
-                if request != nil {
+            // Send a REQUEST to Twitter using GuestAuthentication e.g. no authenticated user just the app.
+            Twitter.sharedInstance().logInWithCompletion{
+                (session, error) -> Void in
+                if (session != nil) {
 
-                    // let's send us a REST API reuest
-                    Twitter.sharedInstance().APIClient.sendTwitterRequest(request) {
-                        (response, data, connectionError) -> Void in
-                        if (connectionError == nil) {
+                    // woohoo we have a session - let's get crazy
+                    let request = Twitter.sharedInstance().APIClient.URLRequestWithMethod("GET", URL:  RESTAPIEndpoint, parameters: params, error:&clientError)
 
-                            // Setup a tweet array to contain all of those juicy tweets
-                            var jsonError : NSError?
-                            let json : AnyObject? =
-                            NSJSONSerialization.JSONObjectWithData(data,
-                                options: nil,
-                                error: &jsonError)
+                    // if the request is ready to rock and roll
+                    if request != nil {
 
-                            var tweetArray = Array<Tweep>()
+                        // let's send us a REST API reuest
+                        Twitter.sharedInstance().APIClient.sendTwitterRequest(request) {
+                            (response, data, connectionError) -> Void in
+                            if (connectionError == nil) {
 
-                            // Iterate through JSON response and append the values to the TweetArray
-                            if let jsonObject = json as? JSONDictionary {
-                                if let tweeps = jsonObject["users"] as? JSONArray {
-                                    for tweep in tweeps {
-                                        if let tweepData = tweep as? JSONDictionary {
-                                            if let screen_name = tweepData["screen_name"] as? String {
-                                                if let name = tweepData["name"] as? String {
-                                                    if let image = tweepData["profile_image_url"] as? String {
-                                                        let highimage = image.stringByReplacingOccurrencesOfString("_normal", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
-                                                        //println(image)
-                                                        tweetArray.append(Tweep(name: name, image: highimage, screen_name: screen_name))
+                                // Setup a tweet array to contain all of those juicy tweets
+                                var jsonError : NSError?
+                                let json : AnyObject? =
+                                NSJSONSerialization.JSONObjectWithData(data,
+                                    options: nil,
+                                    error: &jsonError)
+
+                                var tweetArray = Array<Tweep>()
+
+                                // Iterate through JSON response and append the values to the TweetArray
+                                if let jsonObject = json as? JSONDictionary {
+                                    if let tweeps = jsonObject["users"] as? JSONArray {
+                                        for tweep in tweeps {
+                                            if let tweepData = tweep as? JSONDictionary {
+                                                if let screen_name = tweepData["screen_name"] as? String {
+                                                    if let name = tweepData["name"] as? String {
+                                                        if let image = tweepData["profile_image_url"] as? String {
+                                                            let highimage = image.stringByReplacingOccurrencesOfString("_normal", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+                                                            //println(image)
+                                                            tweetArray.append(Tweep(name: name, image: highimage, screen_name: screen_name))
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
                                     }
                                 }
+                                completion(result: tweetArray)
                             }
-                            completion(result: tweetArray)
-                        }
-                            
-                            
-                            
-                        else {
-                            println("Error: \(connectionError)")
+
+                            else {
+                                completion(result: Array<Tweep>())
+                            }
                         }
                     }
-                }
-                else {
-                    println("Error: \(clientError)")
+                    else {
+                        completion(result: Array<Tweep>())
+                    }
+
+                } else {
+                    completion(result: Array<Tweep>())
                 }
                 
-            } else {
-                println("error: \(error.localizedDescription)");
             }
-            
+        } else {
+            completion(result: Array<Tweep>())
         }
     }
 }

@@ -19,6 +19,7 @@ Priority:
 - Store saved profiles locally unless a backend is explicitly added
 - Avoid committing API keys, tokens, or captured profile datasets
 - Guard Twitter API JSON parsing before using tweet IDs or profile-image data
+- Guard Twitter sessions before friends-list request setup
 - Skip malformed Twitter API records instead of crashing
 - Avoid force-unwrapping remote profile image URLs or decoded image data
 - Guard current-user profile image loading before using session or image data

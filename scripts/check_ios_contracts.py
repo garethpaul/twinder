@@ -70,6 +70,14 @@ def check_tweep_picture_json_guard():
 def check_api_json_guards():
     source = read_text("Twinder/API.swift")
     require("json!" not in source, "API.swift must not force-unwrap parsed JSON")
+    require(
+        "Twitter.sharedInstance().session().userName" not in source,
+        "friends-list parsing must not force-use the Twitter session username",
+    )
+    require(
+        "if let currentSession = Twitter.sharedInstance().session()" in source,
+        "friends-list parsing must guard the current Twitter session before request setup",
+    )
     require("tweets.count > 0" in source, "timeline parsing must check for at least one tweet")
     require("if let jsonObject = json as? JSONDictionary" in source, "friends-list parsing must validate JSON dictionary shape")
     require("if let tweepData = tweep as? JSONDictionary" in source, "friends-list parsing must validate each user record")

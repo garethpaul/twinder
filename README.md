@@ -57,8 +57,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 
 - `make check` runs plist, storyboard, asset, CocoaPods lock, Twitter API JSON
   parsing, profile-image loading, current-user profile image loading,
-  swipe-card remote-data, login session, and Core Data failure-path contract
-  checks.
+  swipe-card remote-data, friends-list session, login session, and Core Data
+  failure-path contract checks.
 - Completed maintenance plans live under `docs/plans` and are checked by
   `make check`.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
@@ -95,6 +95,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   remote profile and tweet rendering guard coverage.
 - See `docs/plans/2026-06-09-login-session-guard.md` for TwitterKit login
   navigation guard coverage without logging auth details.
+- See `docs/plans/2026-06-09-api-session-guard.md` for friends-list session
+  guard coverage.
 
 ## Contributing
 

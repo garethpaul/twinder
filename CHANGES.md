@@ -2,6 +2,8 @@
 
 ## 2026-06-09
 
+- Guarded friends-list request setup before using the current Twitter session
+  username and extended static checker coverage.
 - Guarded current-user profile image loading before using the Twitter session,
   remote image URL, decoded image data, or profile image outlet.
 - Added static checker coverage for current-user profile image guardrails.
