@@ -110,7 +110,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 } else {
                     NSLog("Failed to save context")
                 }
-                abort()
             }
         }
     }
