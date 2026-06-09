@@ -78,6 +78,44 @@ def check_api_json_guards():
     )
 
 
+def check_profile_image_loading_guards():
+    view_controller = read_text("Twinder/ViewController.swift")
+    picture = read_text("Twinder/Picture.swift")
+
+    require(
+        "tweep!.image" not in view_controller,
+        "ViewController must not force-unwrap the selected Tweep image URL",
+    )
+    require(
+        "NSURL(string: url_string)!" not in view_controller,
+        "ViewController must not force-unwrap profile image URL construction",
+    )
+    require(
+        "if let selectedTweep = self.tweep" in view_controller,
+        "ViewController must guard selected Tweep before image loading",
+    )
+    require(
+        "if let imageURL = NSURL(string: url_string)" in view_controller,
+        "ViewController must guard profile image URL construction",
+    )
+    require(
+        "if let newImg = image" in view_controller,
+        "ViewController must guard decoded profile images before assignment",
+    )
+    require(
+        "func get(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void))" in picture,
+        "Picture.get must expose optional decoded images",
+    )
+    require(
+        "UIImage(data: data)!" not in picture,
+        "Picture.get must not force-unwrap decoded image data",
+    )
+    require(
+        "handler(image: nil, error)" in picture,
+        "Picture.get must report failed image downloads without crashing",
+    )
+
+
 def check_docs_plans():
     require(DOCS_PLANS.is_dir(), "docs/plans must exist")
     plans = sorted(DOCS_PLANS.glob("*.md"))
@@ -96,6 +134,7 @@ def main():
         check_pod_lock_integrity,
         check_tweep_picture_json_guard,
         check_api_json_guards,
+        check_profile_image_loading_guards,
         check_docs_plans,
     ]
     try:

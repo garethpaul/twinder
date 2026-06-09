@@ -20,6 +20,7 @@ Priority:
 - Avoid committing API keys, tokens, or captured profile datasets
 - Guard Twitter API JSON parsing before using tweet IDs or profile-image data
 - Skip malformed Twitter API records instead of crashing
+- Avoid force-unwrapping remote profile image URLs or decoded image data
 
 Next priorities:
 

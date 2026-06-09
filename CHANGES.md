@@ -2,6 +2,8 @@
 
 ## 2026-06-08
 
+- Guarded profile-card image URL creation and image decoding before assigning
+  downloaded profile images.
 - Added canonical `docs/plans` coverage to the static iOS contract checker.
 - Added `make verify` and `make check` static gates for plist, storyboard, asset, CocoaPods lock, and Twitter JSON parsing contracts.
 - Guarded profile image JSON parsing in `TweepPicture` instead of force-unwrapping the parsed response.

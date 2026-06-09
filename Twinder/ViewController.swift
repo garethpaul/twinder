@@ -19,14 +19,16 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if(self.tweep != nil) {
+        if let selectedTweep = self.tweep {
             let pic = Picture()
-            let url_string = tweep!.image
-            pic.get(NSURL(string: url_string)!, {image, error in
-                let newImg = image
-                self.imageView.image = newImg
-
-            })
+            let url_string = selectedTweep.image
+            if let imageURL = NSURL(string: url_string) {
+                pic.get(imageURL, {image, error in
+                    if let newImg = image {
+                        self.imageView.image = newImg
+                    }
+                })
+            }
 
         }
     }
