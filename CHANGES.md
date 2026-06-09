@@ -2,6 +2,9 @@
 
 ## 2026-06-09
 
+- Guarded Twitter login navigation so failed or cancelled TwitterKit logins do
+  not enter the main profile flow.
+- Added static checker coverage for the login session guard.
 - Guarded swipe-card profile data, profile image URL construction, decoded
   image assignment, and embedded tweet rendering before using remote Twitter
   data.

@@ -182,6 +182,24 @@ def check_core_data_failure_guards():
     )
 
 
+def check_login_session_guard():
+    source = read_text("Twinder/LoginController.swift")
+
+    require(
+        'self.performSegueWithIdentifier("ViewController", sender: self)' in source,
+        "LoginController must keep routing successful logins to the main view",
+    )
+    require(
+        "if session != nil && error == nil" in source,
+        "LoginController must only segue after TwitterKit returns a session without an error",
+    )
+    require(
+        source.index("if session != nil && error == nil")
+        < source.index('self.performSegueWithIdentifier("ViewController", sender: self)'),
+        "LoginController must check the TwitterKit session before segueing",
+    )
+
+
 def check_docs_plans():
     require(DOCS_PLANS.is_dir(), "docs/plans must exist")
     plans = sorted(DOCS_PLANS.glob("*.md"))
@@ -203,6 +221,7 @@ def main():
         check_profile_image_loading_guards,
         check_swipe_card_remote_data_guards,
         check_core_data_failure_guards,
+        check_login_session_guard,
         check_docs_plans,
     ]
     try:

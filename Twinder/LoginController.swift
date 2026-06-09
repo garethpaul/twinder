@@ -15,9 +15,12 @@ class LoginController: UIViewController {
         // If the login is successful then move the user to the viewController
         let logInButton = TWTRLogInButton(logInCompletion: {
             (session: TWTRSession!, error: NSError!) in
-            
 
-            self.performSegueWithIdentifier("ViewController", sender: self)
+            if session != nil && error == nil {
+                self.performSegueWithIdentifier("ViewController", sender: self)
+            } else if let loginError = error {
+                println("Twitter login failed: \(loginError.localizedDescription)")
+            }
         })
 
         // Append the login button to the view
@@ -35,4 +38,3 @@ class LoginController: UIViewController {
     
     
 }
-
