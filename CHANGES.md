@@ -2,6 +2,9 @@
 
 ## 2026-06-09
 
+- Guarded current-user profile image loading before using the Twitter session,
+  remote image URL, decoded image data, or profile image outlet.
+- Added static checker coverage for current-user profile image guardrails.
 - Guarded Twitter login navigation so failed or cancelled TwitterKit logins do
   not enter the main profile flow or log auth details.
 - Added static checker coverage for the login session guard.

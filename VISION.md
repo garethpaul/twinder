@@ -21,6 +21,7 @@ Priority:
 - Guard Twitter API JSON parsing before using tweet IDs or profile-image data
 - Skip malformed Twitter API records instead of crashing
 - Avoid force-unwrapping remote profile image URLs or decoded image data
+- Guard current-user profile image loading before using session or image data
 - Guard swipe-card rendering before using remote profile or tweet data
 - Keep failed or cancelled TwitterKit logins on the login screen without
   logging auth details

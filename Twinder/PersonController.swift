@@ -42,16 +42,19 @@ class PersonController: UIViewController {
         logoutBtn.sizeToFit()
 
         // Get User's Picture
-        TweepPicture(Twitter().session().userName){ (result: String) in
-            let pic = Picture()
-            let url = result.stringByReplacingOccurrencesOfString("_normal", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
-            pic.get(NSURL(string: url)!, {image, error in
-                let newImg = image
-                let circle = CircleImage(RBResizeImage(newImg, CGSize(width: 150, height: 150)))
-                self.peepImg!.image = circle
-
-
-            })
+        if let session = Twitter.sharedInstance().session() {
+            TweepPicture(session.userName){ (result: String) in
+                let pic = Picture()
+                let url = result.stringByReplacingOccurrencesOfString("_normal", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+                if let imageURL = NSURL(string: url) {
+                    pic.get(imageURL, {image, error in
+                        if let profileImage = image {
+                            let circle = CircleImage(RBResizeImage(profileImage, CGSize(width: 150, height: 150)))
+                            self.peepImg.image = circle
+                        }
+                    })
+                }
+            }
         }
 
     }
@@ -62,4 +65,3 @@ class PersonController: UIViewController {
     }
     
 }
-

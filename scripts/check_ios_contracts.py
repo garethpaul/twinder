@@ -4,6 +4,7 @@
 from pathlib import Path
 import json
 import plistlib
+import re
 import sys
 import xml.etree.ElementTree as ET
 
@@ -116,6 +117,39 @@ def check_profile_image_loading_guards():
     )
 
 
+def check_person_profile_image_guards():
+    source = read_text("Twinder/PersonController.swift")
+
+    require(
+        "Twitter().session().userName" not in source,
+        "PersonController must not force-use the Twitter session username",
+    )
+    require(
+        "if let session = Twitter.sharedInstance().session()" in source,
+        "PersonController must guard the current Twitter session before profile image loading",
+    )
+    require(
+        "NSURL(string: url)!" not in source,
+        "PersonController must not force-unwrap profile image URL construction",
+    )
+    require(
+        "if let imageURL = NSURL(string: url)" in source,
+        "PersonController must guard profile image URL construction",
+    )
+    require(
+        not re.search(r"^\s*let newImg = image\s*$", source, re.MULTILINE),
+        "PersonController must not assign optional decoded profile image data directly",
+    )
+    require(
+        "if let profileImage = image" in source,
+        "PersonController must guard decoded profile images before resizing",
+    )
+    require(
+        "self.peepImg!.image" not in source,
+        "PersonController must not force-unwrap the profile image outlet when assigning",
+    )
+
+
 def check_swipe_card_remote_data_guards():
     source = read_text("Twinder/TweepPickerView.swift")
 
@@ -223,6 +257,7 @@ def main():
         check_tweep_picture_json_guard,
         check_api_json_guards,
         check_profile_image_loading_guards,
+        check_person_profile_image_guards,
         check_swipe_card_remote_data_guards,
         check_core_data_failure_guards,
         check_login_session_guard,
