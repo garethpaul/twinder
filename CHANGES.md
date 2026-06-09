@@ -2,6 +2,8 @@
 
 ## 2026-06-09
 
+- Guarded friends-list response parsing behind response-data presence and
+  removed username console logging from request setup.
 - Completed swipe-card timeline tweet lookups with an empty result when request,
   transport, response-data, malformed-JSON, or empty-timeline paths fail, and
   skipped embedded tweet loading for empty IDs.

@@ -16,6 +16,7 @@ TWEEP_PICTURE_FAILURE_PLAN = DOCS_PLANS / "2026-06-09-tweep-picture-failure-comp
 INITIAL_CARD_PLAN = DOCS_PLANS / "2026-06-09-initial-card-data-guards.md"
 TIMELINE_TWEET_FAILURE_PLAN = DOCS_PLANS / "2026-06-09-timeline-tweet-failure-completion.md"
 TIMELINE_TWEET_PLAN = DOCS_PLANS / "2026-06-09-timeline-tweet-completion.md"
+FRIENDS_LIST_DATA_PLAN = DOCS_PLANS / "2026-06-09-friends-list-data-guard.md"
 
 
 def fail(message):
@@ -115,6 +116,14 @@ def check_api_json_guards():
     require(
         "connectionError == nil && data != nil" in source,
         "timeline tweet lookup must verify response data exists before JSON parsing",
+    )
+    require(
+        source.count("connectionError == nil && data != nil") >= 2,
+        "friends-list and timeline tweet lookups must verify response data exists before JSON parsing",
+    )
+    require(
+        "println(screen_name)" not in source,
+        "friends-list lookup must not log Twitter usernames",
     )
     require(
         'var tweetResult = ""' in source,
@@ -335,6 +344,7 @@ def check_docs_plans():
     require(INITIAL_CARD_PLAN in plans, f"{INITIAL_CARD_PLAN.relative_to(ROOT)} must be present")
     require(TIMELINE_TWEET_FAILURE_PLAN in plans, f"{TIMELINE_TWEET_FAILURE_PLAN.relative_to(ROOT)} must be present")
     require(TIMELINE_TWEET_PLAN in plans, f"{TIMELINE_TWEET_PLAN.relative_to(ROOT)} must be present")
+    require(FRIENDS_LIST_DATA_PLAN in plans, f"{FRIENDS_LIST_DATA_PLAN.relative_to(ROOT)} must be present")
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")

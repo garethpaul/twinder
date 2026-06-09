@@ -20,6 +20,8 @@ Priority:
 - Avoid committing API keys, tokens, or captured profile datasets
 - Guard Twitter API JSON parsing before using tweet IDs or profile-image data
 - Guard Twitter sessions before friends-list request setup
+- Guard friends-list responses before parsing and avoid logging Twitter
+  usernames
 - Skip malformed Twitter API records instead of crashing
 - Avoid force-unwrapping remote profile image URLs or decoded image data
 - Guard current-user profile image loading before using session or image data
@@ -61,6 +63,7 @@ saved profiles without consent.
 
 - Checked-in Twitter or Fabric credentials
 - Captured user-profile datasets
+- Console logging of Twitter usernames, tweet IDs, or API payload details
 - Hidden analytics or profile upload
 - SDK rewrites without preserving the sample flow
 

@@ -102,7 +102,6 @@ class APIClient {
         // setup the params for the request
         if let currentSession = Twitter.sharedInstance().session() {
             let screen_name = currentSession.userName
-            println(screen_name)
             let params = ["count": "200", "include_user_entities": "true", "screen_name": screen_name]
 
             // setup container for an error
@@ -122,7 +121,7 @@ class APIClient {
                         // let's send us a REST API reuest
                         Twitter.sharedInstance().APIClient.sendTwitterRequest(request) {
                             (response, data, connectionError) -> Void in
-                            if (connectionError == nil) {
+                            if (connectionError == nil && data != nil) {
 
                                 // Setup a tweet array to contain all of those juicy tweets
                                 var jsonError : NSError?
