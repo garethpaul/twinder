@@ -2,6 +2,10 @@
 
 ## 2026-06-09
 
+- Completed swipe-card timeline tweet lookups with an empty result when request,
+  transport, response-data, malformed-JSON, or empty-timeline paths fail, and
+  skipped embedded tweet loading for empty IDs.
+- Extended static checker coverage for timeline tweet completion guards.
 - Completed current-user profile image lookup failures instead of logging
   Twitter API error details or leaving callers waiting.
 - Added static checker coverage for TweepPicture failure completions.

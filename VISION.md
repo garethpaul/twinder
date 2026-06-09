@@ -25,6 +25,8 @@ Priority:
 - Guard current-user profile image loading before using session or image data
 - Complete current-user profile image lookup failures without logging Twitter
   API details
+- Complete missing or failing timeline tweet lookups without logging tweet IDs
+  or attempting embedded tweet rendering with empty results
 - Guard swipe-card rendering before using remote profile or tweet data
 - Guard initial swipe-card creation before removing fetched Tweeps
 - Keep failed or cancelled TwitterKit logins on the login screen without

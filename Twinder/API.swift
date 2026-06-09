@@ -55,10 +55,11 @@ class APIClient {
             Twitter.sharedInstance().APIClient.sendTwitterRequest(request) {
                 (response, data, connectionError) -> Void in
 
-                if (connectionError == nil) {
+                if (connectionError == nil && data != nil) {
 
                     // Setup a tweet array to contain all of those juicy tweets
                     var jsonError : NSError?
+                    var tweetResult = ""
                     let json : AnyObject? =
                     NSJSONSerialization.JSONObjectWithData(data,
                         options: nil,
@@ -68,15 +69,19 @@ class APIClient {
                         if tweets.count > 0 {
                             if let tweetData = tweets[0] as? JSONDictionary {
                                 if let tweet = tweetData["id_str"] as? String {
-                                    println(tweet)
-                                    completion(result: tweet)
+                                    tweetResult = tweet
                                 }
                             }
                         }
                     }
+                    completion(result: tweetResult)
 
+                } else {
+                    completion(result: "")
                 }
             }
+        } else {
+            completion(result: "")
         }
     }
 

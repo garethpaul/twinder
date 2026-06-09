@@ -14,6 +14,8 @@ DOCS_PLANS = ROOT / "docs/plans"
 CANONICAL_PLAN = DOCS_PLANS / "2026-06-08-twinder-baseline.md"
 TWEEP_PICTURE_FAILURE_PLAN = DOCS_PLANS / "2026-06-09-tweep-picture-failure-completion.md"
 INITIAL_CARD_PLAN = DOCS_PLANS / "2026-06-09-initial-card-data-guards.md"
+TIMELINE_TWEET_FAILURE_PLAN = DOCS_PLANS / "2026-06-09-timeline-tweet-failure-completion.md"
+TIMELINE_TWEET_PLAN = DOCS_PLANS / "2026-06-09-timeline-tweet-completion.md"
 
 
 def fail(message):
@@ -93,6 +95,7 @@ def check_tweep_picture_failure_completion():
 
 def check_api_json_guards():
     source = read_text("Twinder/API.swift")
+    swipe_card = read_text("Twinder/TweepPickerView.swift")
     require("json!" not in source, "API.swift must not force-unwrap parsed JSON")
     require(
         "Twitter.sharedInstance().session().userName" not in source,
@@ -108,6 +111,30 @@ def check_api_json_guards():
     require(
         'if let image = tweepData["profile_image_url"] as? String',
         "friends-list parsing must validate profile image URL presence",
+    )
+    require(
+        "connectionError == nil && data != nil" in source,
+        "timeline tweet lookup must verify response data exists before JSON parsing",
+    )
+    require(
+        'var tweetResult = ""' in source,
+        "timeline tweet lookup must keep an empty fallback result",
+    )
+    require(
+        "completion(result: tweetResult)" in source,
+        "timeline tweet lookup must complete after parsing succeeds or finds no tweet",
+    )
+    require(
+        source.count('completion(result: "")') >= 2,
+        "timeline tweet lookup request and transport failure paths must complete",
+    )
+    require(
+        "println(tweet)" not in source,
+        "timeline tweet lookup must not log tweet identifiers",
+    )
+    require(
+        "if tweet_result.isEmpty" in swipe_card,
+        "TweepPickerView must ignore empty timeline tweet lookup completions",
     )
 
 
@@ -306,6 +333,8 @@ def check_docs_plans():
     require(CANONICAL_PLAN in plans, f"{CANONICAL_PLAN.relative_to(ROOT)} must be present")
     require(TWEEP_PICTURE_FAILURE_PLAN in plans, f"{TWEEP_PICTURE_FAILURE_PLAN.relative_to(ROOT)} must be present")
     require(INITIAL_CARD_PLAN in plans, f"{INITIAL_CARD_PLAN.relative_to(ROOT)} must be present")
+    require(TIMELINE_TWEET_FAILURE_PLAN in plans, f"{TIMELINE_TWEET_FAILURE_PLAN.relative_to(ROOT)} must be present")
+    require(TIMELINE_TWEET_PLAN in plans, f"{TIMELINE_TWEET_PLAN.relative_to(ROOT)} must be present")
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")

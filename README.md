@@ -58,8 +58,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - `make check` runs plist, storyboard, asset, CocoaPods lock, Twitter API JSON
   parsing, profile-image loading, current-user profile image loading,
   current-user profile image failure completion, swipe-card remote-data,
-  initial swipe-card data, friends-list session, login session, and Core Data
-  failure-path contract checks.
+  timeline tweet completion, initial swipe-card data, friends-list session,
+  login session, and Core Data failure-path contract checks.
 - Completed maintenance plans live under `docs/plans` and are checked by
   `make check`.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
@@ -102,6 +102,10 @@ When the required SDK or runtime is unavailable, use static checks and source re
   guard coverage.
 - See `docs/plans/2026-06-09-tweep-picture-failure-completion.md` for
   current-user profile image failure completion coverage.
+- See `docs/plans/2026-06-09-timeline-tweet-failure-completion.md` for
+  swipe-card timeline tweet failure completion coverage.
+- See `docs/plans/2026-06-09-timeline-tweet-completion.md` for embedded
+  timeline tweet lookup completion coverage.
 
 ## Contributing
 

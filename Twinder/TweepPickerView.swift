@@ -101,6 +101,9 @@ class TweepPickerView : MDCSwipeToChooseView {
         if let selectedTweep = self.tweep {
             let screenName = selectedTweep.screen_name
             api.getTweet(screenName) { (tweet_result: String) in
+                if tweet_result.isEmpty {
+                    return
+                }
                 Twitter.sharedInstance().APIClient.loadTweetWithID(tweet_result) { (tweet: TWTRTweet!, error: NSError!) in
                     if let loadedTweet = tweet {
                         let tweetView = TWTRTweetView(tweet: loadedTweet)
