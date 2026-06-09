@@ -21,6 +21,7 @@ Priority:
 - Guard Twitter API JSON parsing before using tweet IDs or profile-image data
 - Skip malformed Twitter API records instead of crashing
 - Avoid force-unwrapping remote profile image URLs or decoded image data
+- Avoid aborting on local Core Data store or save failures
 
 Next priorities:
 

@@ -116,6 +116,27 @@ def check_profile_image_loading_guards():
     )
 
 
+def check_core_data_failure_guards():
+    app_delegate = read_text("Twinder/AppDelegate.swift")
+
+    require(
+        "abort()" not in app_delegate,
+        "Core Data failure paths must not abort the app",
+    )
+    require(
+        "error!.userInfo" not in app_delegate,
+        "Core Data failure logging must not force-unwrap error userInfo",
+    )
+    require(
+        "Failed to initialize persistent store" in app_delegate,
+        "persistent store failures must be logged without crashing",
+    )
+    require(
+        "Failed to save context" in app_delegate,
+        "managed object context save failures must be logged without crashing",
+    )
+
+
 def check_docs_plans():
     require(DOCS_PLANS.is_dir(), "docs/plans must exist")
     plans = sorted(DOCS_PLANS.glob("*.md"))
@@ -135,6 +156,7 @@ def main():
         check_tweep_picture_json_guard,
         check_api_json_guards,
         check_profile_image_loading_guards,
+        check_core_data_failure_guards,
         check_docs_plans,
     ]
     try:

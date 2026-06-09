@@ -2,6 +2,8 @@
 
 ## 2026-06-08
 
+- Replaced Core Data failure `abort()` paths with non-crashing log messages and
+  static checker coverage.
 - Guarded profile-card image URL creation and image decoding before assigning
   downloaded profile images.
 - Added canonical `docs/plans` coverage to the static iOS contract checker.
