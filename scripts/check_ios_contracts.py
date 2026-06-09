@@ -116,6 +116,51 @@ def check_profile_image_loading_guards():
     )
 
 
+def check_swipe_card_remote_data_guards():
+    source = read_text("Twinder/TweepPickerView.swift")
+
+    require(
+        "tweep!.image" not in source,
+        "TweepPickerView must not force-unwrap Tweep image URLs",
+    )
+    require(
+        "tweep!.name" not in source,
+        "TweepPickerView must not force-unwrap Tweep names",
+    )
+    require(
+        "tweep!.screen_name" not in source,
+        "TweepPickerView must not force-unwrap Tweep screen names",
+    )
+    require(
+        "NSURL(string: url_string)!" not in source,
+        "TweepPickerView must not force-unwrap profile image URL construction",
+    )
+    require(
+        "self.imageView.image = image" not in source,
+        "TweepPickerView must guard decoded profile images before assignment",
+    )
+    require(
+        "TWTRTweetView(tweet: tweet)" not in source,
+        "TweepPickerView must guard loaded tweets before rendering",
+    )
+    require(
+        "if let selectedTweep = self.tweep" in source,
+        "TweepPickerView must guard selected Tweep data",
+    )
+    require(
+        "if let imageURL = NSURL(string: urlString)" in source,
+        "TweepPickerView must guard profile image URL construction",
+    )
+    require(
+        "if let loadedImage = image" in source,
+        "TweepPickerView must guard decoded profile images before assignment",
+    )
+    require(
+        "if let loadedTweet = tweet" in source,
+        "TweepPickerView must guard embedded tweet loading before rendering",
+    )
+
+
 def check_core_data_failure_guards():
     app_delegate = read_text("Twinder/AppDelegate.swift")
 
@@ -156,6 +201,7 @@ def main():
         check_tweep_picture_json_guard,
         check_api_json_guards,
         check_profile_image_loading_guards,
+        check_swipe_card_remote_data_guards,
         check_core_data_failure_guards,
         check_docs_plans,
     ]

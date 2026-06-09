@@ -66,12 +66,17 @@ class TweepPickerView : MDCSwipeToChooseView {
     }
 
     func loadImageView() {
-        let pic = Picture()
-        let url_string = tweep!.image
-        pic.get(NSURL(string: url_string)!, {image, error in
-            let newImg = image
-            self.imageView.image = image
-        })
+        if let selectedTweep = self.tweep {
+            let pic = Picture()
+            let urlString = selectedTweep.image
+            if let imageURL = NSURL(string: urlString) {
+                pic.get(imageURL, {image, error in
+                    if let loadedImage = image {
+                        self.imageView.image = loadedImage
+                    }
+                })
+            }
+        }
 
 
     }
@@ -85,22 +90,25 @@ class TweepPickerView : MDCSwipeToChooseView {
         //        )
 
         let nameLabel: UILabel = UILabel(frame: infoView.bounds)
-        nameLabel.text = "\(tweep!.name)"
+        if let selectedTweep = self.tweep {
+            nameLabel.text = "\(selectedTweep.name)"
+        }
         nameLabel.textAlignment = NSTextAlignment.Center
         //nameLabel.textRectForBounds(nameLabel.bounds, limitedToNumberOfLines: 1)
         nameLabel.font = UIFont.systemFontOfSize(20.0)
         nameLabel.adjustsFontSizeToFitWidth = true
         let api = APIClient()
-        let screen_name = tweep!.screen_name
-        api.getTweet(screen_name) { (tweet_result: String) in
-
-
-            Twitter.sharedInstance().APIClient.loadTweetWithID(tweet_result) { (tweet: TWTRTweet!, error: NSError!) in
-                let tweetView = TWTRTweetView(tweet: tweet)
-                tweetView.showBorder = false
-                self.infoView.addSubview(tweetView)
+        if let selectedTweep = self.tweep {
+            let screenName = selectedTweep.screen_name
+            api.getTweet(screenName) { (tweet_result: String) in
+                Twitter.sharedInstance().APIClient.loadTweetWithID(tweet_result) { (tweet: TWTRTweet!, error: NSError!) in
+                    if let loadedTweet = tweet {
+                        let tweetView = TWTRTweetView(tweet: loadedTweet)
+                        tweetView.showBorder = false
+                        self.infoView.addSubview(tweetView)
+                    }
+                }
             }
-
         }
 
 
@@ -109,4 +117,3 @@ class TweepPickerView : MDCSwipeToChooseView {
         //infoView.addSubview(nameLabel)
     }
 }
-

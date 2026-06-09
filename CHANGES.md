@@ -1,5 +1,12 @@
 # Changes
 
+## 2026-06-09
+
+- Guarded swipe-card profile data, profile image URL construction, decoded
+  image assignment, and embedded tweet rendering before using remote Twitter
+  data.
+- Added static checker coverage for swipe-card remote-data guardrails.
+
 ## 2026-06-08
 
 - Replaced Core Data failure `abort()` paths with non-crashing log messages and
