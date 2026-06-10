@@ -24,6 +24,8 @@ Priority:
   usernames
 - Skip malformed Twitter API records instead of crashing
 - Avoid force-unwrapping remote profile image URLs or decoded image data
+- Require bounded HTTPS transport and validated responses for shared profile
+  image downloads
 - Guard current-user profile image loading before using session or image data
 - Complete current-user profile image lookup failures without logging Twitter
   API details
@@ -35,6 +37,7 @@ Priority:
   logging auth details
 - Avoid aborting on local Core Data store or save failures
 - Keep GitHub Actions aligned with the local Python `make check` baseline
+- Keep CI runners and third-party actions pinned to reviewed versions
 
 Next priorities:
 

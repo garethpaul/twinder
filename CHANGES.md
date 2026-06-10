@@ -2,6 +2,11 @@
 
 ## 2026-06-10
 
+- Restricted shared profile image downloads to bounded HTTPS requests, moved
+  network work off the main queue, and validated status, media type, size, and
+  decoded image data before UI callbacks.
+- Made local checks independent of the caller's working directory and fixed the
+  hosted runner and action release annotations to reviewed versions.
 - Added a pinned, read-only GitHub Actions matrix for Python 3.10, 3.12, and
   3.14 that runs `make check`.
 - Extended the static contract checker and docs to require the hosted CI

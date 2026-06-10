@@ -18,6 +18,7 @@ TIMELINE_TWEET_FAILURE_PLAN = DOCS_PLANS / "2026-06-09-timeline-tweet-failure-co
 TIMELINE_TWEET_PLAN = DOCS_PLANS / "2026-06-09-timeline-tweet-completion.md"
 FRIENDS_LIST_DATA_PLAN = DOCS_PLANS / "2026-06-09-friends-list-data-guard.md"
 CI_PLAN = DOCS_PLANS / "2026-06-10-ci-baseline.md"
+PROFILE_IMAGE_TRANSPORT_PLAN = DOCS_PLANS / "2026-06-10-profile-image-transport.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -185,6 +186,26 @@ def check_profile_image_loading_guards():
         "handler(image: nil, error)" in picture,
         "Picture.get must report failed image downloads without crashing",
     )
+    transport_contracts = {
+        'url.scheme?.lowercaseString != "https"': "require HTTPS profile image URLs",
+        "maximumImageBytes = 5 * 1024 * 1024": "bound profile image responses to 5 MiB",
+        "cachePolicy: .ReturnCacheDataElseLoad": "use the response cache when possible",
+        "timeoutInterval: 15": "bound profile image request duration",
+        "queue: NSOperationQueue()": "download profile images off the main queue",
+        "if let httpResponse = response as? NSHTTPURLResponse": "validate HTTP responses",
+        "httpResponse.statusCode >= 200 && httpResponse.statusCode < 300": "reject non-success HTTP responses",
+        'mimeType?.hasPrefix("image/") == true': "reject non-image response bodies",
+        "data.length <= self.maximumImageBytes": "reject oversized response bodies",
+        "dispatch_async(dispatch_get_main_queue())": "deliver image completions on the main queue",
+        'description: "Profile image could not be decoded"': "report image decode failures",
+    }
+    for fragment, behavior in transport_contracts.items():
+        require(fragment in picture, f"Picture.get must {behavior}")
+    require(
+        "queue: NSOperationQueue.mainQueue()" not in picture,
+        "Picture.get must not perform profile image downloads on the main queue",
+    )
+    require("httpResponse!" not in picture, "Picture.get must not force-unwrap HTTP responses")
 
 
 def check_person_profile_image_guards():
@@ -348,6 +369,10 @@ def check_docs_plans():
     require(TIMELINE_TWEET_PLAN in plans, f"{TIMELINE_TWEET_PLAN.relative_to(ROOT)} must be present")
     require(FRIENDS_LIST_DATA_PLAN in plans, f"{FRIENDS_LIST_DATA_PLAN.relative_to(ROOT)} must be present")
     require(CI_PLAN in plans, f"{CI_PLAN.relative_to(ROOT)} must be present")
+    require(
+        PROFILE_IMAGE_TRANSPORT_PLAN in plans,
+        f"{PROFILE_IMAGE_TRANSPORT_PLAN.relative_to(ROOT)} must be present",
+    )
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")
@@ -360,12 +385,26 @@ def check_ci_baseline_docs():
     workflow = CI_WORKFLOW.read_text(encoding="utf-8")
     require("permissions:\n  contents: read" in workflow, "CI workflow must keep contents read-only")
     require("timeout-minutes: 10" in workflow, "CI workflow must have a bounded runtime")
+    require("runs-on: ubuntu-24.04" in workflow, "CI workflow must use a fixed Ubuntu runner")
+    require("concurrency:" in workflow, "CI workflow must cancel superseded runs")
+    require("cancel-in-progress: true" in workflow, "CI workflow must cancel superseded runs")
     require('python-version: ["3.10", "3.12", "3.14"]' in workflow, "CI workflow must cover supported Python versions")
     require("actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" in workflow, "CI workflow must pin checkout")
     require("actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405" in workflow, "CI workflow must pin Python setup")
     require("workflow_dispatch:" in workflow, "CI workflow must support manual verification")
     require("run: make check" in workflow, "CI workflow must run make check")
     require("@v" not in workflow, "CI workflow actions must use immutable commits")
+    require("ubuntu-latest" not in workflow, "CI workflow must not use a floating Ubuntu runner")
+    require("# v6.0.3" in workflow, "checkout pin annotation must identify the exact release")
+    require("# v6.2.0" in workflow, "setup-python pin annotation must identify the exact release")
+
+    makefile = read_text("Makefile")
+    require(
+        "ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile,
+        "Makefile must resolve commands from the repository root",
+    )
+    require('"$(ROOT)/scripts/check_ios_contracts.py"' in makefile, "Makefile must use the rooted checker path")
+    require('cd "$(ROOT)" && xcodebuild' in makefile, "Makefile must run xcodebuild from the repository root")
 
     docs = {
         "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md"],

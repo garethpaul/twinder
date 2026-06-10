@@ -35,6 +35,9 @@ Helpful reports include:
 - GitHub Actions runs `make check` for pushes and pull requests so the static
   Xcode, CocoaPods lock, Twitter API, and Core Data guardrails stay enforced
   before merge.
+- The shared profile image helper accepts only HTTPS URLs, uses bounded request
+  duration and response size, validates successful image responses, and keeps
+  network work off the main operation queue.
 
 ## Mobile Privacy Notes
 

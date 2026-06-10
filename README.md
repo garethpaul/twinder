@@ -61,10 +61,13 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   timeline tweet completion, initial swipe-card data, friends-list session,
   friends-list response data, login session, and Core Data failure-path
   contract checks.
+- Shared profile image downloads require HTTPS, run off the main queue, time
+  out after 15 seconds, and reject non-success, non-image, oversized, or
+  undecodable responses before returning to UI code on the main queue.
 - Completed maintenance plans live under `docs/plans` and are checked by
   `make check`.
 - GitHub Actions runs the same static contracts on Python 3.10, 3.12, and 3.14
-  with read-only permissions and immutable action pins.
+  on Ubuntu 24.04 with read-only permissions and immutable action pins.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
@@ -113,6 +116,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   timeline tweet lookup completion coverage.
 - See `docs/plans/2026-06-10-ci-baseline.md` for the hosted static contract
   baseline.
+- See `docs/plans/2026-06-10-profile-image-transport.md` for the completed
+  profile image transport hardening.
 
 ## Contributing
 
