@@ -17,6 +17,8 @@ INITIAL_CARD_PLAN = DOCS_PLANS / "2026-06-09-initial-card-data-guards.md"
 TIMELINE_TWEET_FAILURE_PLAN = DOCS_PLANS / "2026-06-09-timeline-tweet-failure-completion.md"
 TIMELINE_TWEET_PLAN = DOCS_PLANS / "2026-06-09-timeline-tweet-completion.md"
 FRIENDS_LIST_DATA_PLAN = DOCS_PLANS / "2026-06-09-friends-list-data-guard.md"
+CI_PLAN = DOCS_PLANS / "2026-06-10-ci-baseline.md"
+CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
 def fail(message):
@@ -345,11 +347,37 @@ def check_docs_plans():
     require(TIMELINE_TWEET_FAILURE_PLAN in plans, f"{TIMELINE_TWEET_FAILURE_PLAN.relative_to(ROOT)} must be present")
     require(TIMELINE_TWEET_PLAN in plans, f"{TIMELINE_TWEET_PLAN.relative_to(ROOT)} must be present")
     require(FRIENDS_LIST_DATA_PLAN in plans, f"{FRIENDS_LIST_DATA_PLAN.relative_to(ROOT)} must be present")
+    require(CI_PLAN in plans, f"{CI_PLAN.relative_to(ROOT)} must be present")
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")
         require("Status: Completed" in text, f"{plan.name} must be completed")
         require("make check" in text, f"{plan.name} must document make check verification")
+
+
+def check_ci_baseline_docs():
+    require(CI_WORKFLOW.exists(), ".github/workflows/check.yml is missing")
+    workflow = CI_WORKFLOW.read_text(encoding="utf-8")
+    require("permissions:\n  contents: read" in workflow, "CI workflow must keep contents read-only")
+    require("timeout-minutes: 10" in workflow, "CI workflow must have a bounded runtime")
+    require('python-version: ["3.10", "3.12", "3.14"]' in workflow, "CI workflow must cover supported Python versions")
+    require("actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" in workflow, "CI workflow must pin checkout")
+    require("actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405" in workflow, "CI workflow must pin Python setup")
+    require("workflow_dispatch:" in workflow, "CI workflow must support manual verification")
+    require("run: make check" in workflow, "CI workflow must run make check")
+    require("@v" not in workflow, "CI workflow actions must use immutable commits")
+
+    docs = {
+        "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md"],
+        "VISION.md": ["GitHub Actions"],
+        "SECURITY.md": ["GitHub Actions", "make check"],
+        "CHANGES.md": ["GitHub Actions"],
+    }
+
+    for relative_path, required_phrases in docs.items():
+        text = read_text(relative_path)
+        for phrase in required_phrases:
+            require(phrase in text, f"{relative_path} must document {phrase}")
 
 
 def main():
@@ -366,6 +394,7 @@ def main():
         check_core_data_failure_guards,
         check_login_session_guard,
         check_docs_plans,
+        check_ci_baseline_docs,
     ]
     try:
         for check in checks:

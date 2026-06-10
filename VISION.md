@@ -34,6 +34,7 @@ Priority:
 - Keep failed or cancelled TwitterKit logins on the login screen without
   logging auth details
 - Avoid aborting on local Core Data store or save failures
+- Keep GitHub Actions aligned with the local Python `make check` baseline
 
 Next priorities:
 
@@ -48,6 +49,7 @@ Contribution rules:
 - Do not commit credentials or harvested user profile data.
 - Keep demo data clearly marked.
 - Include simulator/device notes for interaction changes.
+- Keep `.github/workflows/check.yml` in sync with the local static contract.
 
 ## Security And Responsible Use
 

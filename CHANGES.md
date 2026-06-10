@@ -1,5 +1,12 @@
 # Changes
 
+## 2026-06-10
+
+- Added a pinned, read-only GitHub Actions matrix for Python 3.10, 3.12, and
+  3.14 that runs `make check`.
+- Extended the static contract checker and docs to require the hosted CI
+  verification path.
+
 ## 2026-06-09
 
 - Guarded friends-list response parsing behind response-data presence and
