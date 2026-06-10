@@ -19,6 +19,7 @@ TIMELINE_TWEET_PLAN = DOCS_PLANS / "2026-06-09-timeline-tweet-completion.md"
 FRIENDS_LIST_DATA_PLAN = DOCS_PLANS / "2026-06-09-friends-list-data-guard.md"
 CI_PLAN = DOCS_PLANS / "2026-06-10-ci-baseline.md"
 PROFILE_IMAGE_TRANSPORT_PLAN = DOCS_PLANS / "2026-06-10-profile-image-transport.md"
+TABLE_IMAGE_REUSE_PLAN = DOCS_PLANS / "2026-06-10-table-image-reuse.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -241,6 +242,28 @@ def check_person_profile_image_guards():
     )
 
 
+def check_table_profile_image_reuse_guards():
+    source = read_text("Twinder/TableController.swift")
+
+    for contract in (
+        "cell.peepImage.image = nil",
+        "if let imageURL = NSURL(string: fav_tweep.image_url)",
+        "if let img = newImage",
+        "if let currentIndexPath = tableView.indexPathForCell(cell)",
+        "if currentIndexPath.isEqual(indexPath)",
+    ):
+        require(contract in source, f"saved-profile table image guard is missing: {contract}")
+
+    require(
+        "NSURL(string: fav_tweep.image_url)!" not in source,
+        "saved-profile table must not force-unwrap profile image URLs",
+    )
+    require(
+        "let img: UIImage = NewImage" not in source,
+        "saved-profile table must not assign optional decoded image data directly",
+    )
+
+
 def check_swipe_card_remote_data_guards():
     source = read_text("Twinder/TweepPickerView.swift")
 
@@ -373,6 +396,7 @@ def check_docs_plans():
         PROFILE_IMAGE_TRANSPORT_PLAN in plans,
         f"{PROFILE_IMAGE_TRANSPORT_PLAN.relative_to(ROOT)} must be present",
     )
+    require(TABLE_IMAGE_REUSE_PLAN in plans, f"{TABLE_IMAGE_REUSE_PLAN.relative_to(ROOT)} must be present")
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")
@@ -428,6 +452,7 @@ def main():
         check_api_json_guards,
         check_profile_image_loading_guards,
         check_person_profile_image_guards,
+        check_table_profile_image_reuse_guards,
         check_swipe_card_remote_data_guards,
         check_initial_card_data_guards,
         check_core_data_failure_guards,

@@ -2,6 +2,8 @@
 
 ## 2026-06-10
 
+- Guarded saved-profile table image loading against malformed URLs, failed
+  decoding, and asynchronous results targeting reused cells.
 - Restricted shared profile image downloads to bounded HTTPS requests, moved
   network work off the main queue, and validated status, media type, size, and
   decoded image data before UI callbacks.

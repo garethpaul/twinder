@@ -109,28 +109,32 @@ class TableController:UIViewController, UITableViewDataSource, UITableViewDelega
         // Work through the fav_tweets based on their index e.g. FavTweets[0] - first fav
         if let fav_tweep = self.fav_tweeps[indexPath.item] as FavTweets! {
 
-            // get the image from the cell (see Views/TweepCell.swift)
-            let old = cell.peepImage
+            // Clear any image left behind by a reused cell.
+            cell.peepImage.image = nil
 
             // Create a new instance of picture (see Functions/Picture.swift)
             let pic = Picture()
 
             // Send HTTP request to get the image
-            pic.get(NSURL(string: fav_tweep.image_url)!, {NewImage, error in
+            if let imageURL = NSURL(string: fav_tweep.image_url) {
+                pic.get(imageURL, {newImage, error in
+                    if let img = newImage {
+                        if let currentIndexPath = tableView.indexPathForCell(cell) {
+                            if currentIndexPath.isEqual(indexPath) {
+                                let width = img.size.width;
+                                let height = img.size.height;
+                                let screenWidth = self.view.frame.size.width;
+                                let apect = width/height;
+                                let nHeight = screenWidth/apect;
 
-                // Setup variables for the new image
-                let img: UIImage = NewImage
-                let width = img.size.width;
-                let height = img.size.height;
-                let screenWidth = self.view.frame.size.width;
-                let apect = width/height;
-                let nHeight = screenWidth/apect;
-
-                // Display the new image
-                old.frame = CGRectMake(0, 0, screenWidth, nHeight);
-                old.center = self.view.center;
-                old.image = img;
-            })
+                                cell.peepImage.frame = CGRectMake(0, 0, screenWidth, nHeight);
+                                cell.peepImage.center = self.view.center;
+                                cell.peepImage.image = img;
+                            }
+                        }
+                    }
+                })
+            }
 
             // Don't allow the images to overflow the cell
             cell.clipsToBounds = true

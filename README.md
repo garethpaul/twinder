@@ -64,6 +64,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - Shared profile image downloads require HTTPS, run off the main queue, time
   out after 15 seconds, and reject non-success, non-image, oversized, or
   undecodable responses before returning to UI code on the main queue.
+- Saved-profile rows clear reused images and verify that asynchronous image
+  results still belong to the row before updating the cell.
 - Completed maintenance plans live under `docs/plans` and are checked by
   `make check`.
 - GitHub Actions runs the same static contracts on Python 3.10, 3.12, and 3.14
@@ -118,6 +120,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   baseline.
 - See `docs/plans/2026-06-10-profile-image-transport.md` for the completed
   profile image transport hardening.
+- See `docs/plans/2026-06-10-table-image-reuse.md` for saved-profile table
+  image reuse guard coverage.
 
 ## Contributing
 
