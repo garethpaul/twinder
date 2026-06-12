@@ -68,6 +68,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   contract checks.
 - Completed maintenance plans live under `docs/plans` and are checked by
   `make check`.
+- GitHub Actions installs Python 3.12 and runs `make check` for pushes and
+  pull requests.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
@@ -114,6 +116,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   swipe-card timeline tweet failure completion coverage.
 - See `docs/plans/2026-06-09-timeline-tweet-completion.md` for embedded
   timeline tweet lookup completion coverage.
+- See `docs/plans/2026-06-10-ci-baseline.md` for the hosted GitHub Actions
+  baseline.
 
 ## Contributing
 

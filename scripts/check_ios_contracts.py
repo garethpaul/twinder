@@ -17,6 +17,8 @@ INITIAL_CARD_PLAN = DOCS_PLANS / "2026-06-09-initial-card-data-guards.md"
 TIMELINE_TWEET_FAILURE_PLAN = DOCS_PLANS / "2026-06-09-timeline-tweet-failure-completion.md"
 TIMELINE_TWEET_PLAN = DOCS_PLANS / "2026-06-09-timeline-tweet-completion.md"
 FRIENDS_LIST_DATA_PLAN = DOCS_PLANS / "2026-06-09-friends-list-data-guard.md"
+CI_PLAN = DOCS_PLANS / "2026-06-10-ci-baseline.md"
+CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
 def fail(message):
@@ -345,11 +347,33 @@ def check_docs_plans():
     require(TIMELINE_TWEET_FAILURE_PLAN in plans, f"{TIMELINE_TWEET_FAILURE_PLAN.relative_to(ROOT)} must be present")
     require(TIMELINE_TWEET_PLAN in plans, f"{TIMELINE_TWEET_PLAN.relative_to(ROOT)} must be present")
     require(FRIENDS_LIST_DATA_PLAN in plans, f"{FRIENDS_LIST_DATA_PLAN.relative_to(ROOT)} must be present")
+    require(CI_PLAN in plans, f"{CI_PLAN.relative_to(ROOT)} must be present")
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")
         require("Status: Completed" in text, f"{plan.name} must be completed")
         require("make check" in text, f"{plan.name} must document make check verification")
+
+
+def check_ci_baseline_docs():
+    require(CI_WORKFLOW.exists(), ".github/workflows/check.yml is missing")
+    workflow = CI_WORKFLOW.read_text(encoding="utf-8")
+    require("actions/checkout@v4" in workflow, "CI workflow must check out the repository")
+    require("actions/setup-python@v5" in workflow, "CI workflow must install Python")
+    require('python-version: "3.12"' in workflow, "CI workflow must use Python 3.12")
+    require("run: make check" in workflow, "CI workflow must run make check")
+
+    docs = {
+        "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md"],
+        "VISION.md": ["GitHub Actions"],
+        "SECURITY.md": ["GitHub Actions", "make check"],
+        "CHANGES.md": ["GitHub Actions"],
+    }
+
+    for relative_path, required_phrases in docs.items():
+        text = read_text(relative_path)
+        for phrase in required_phrases:
+            require(phrase in text, f"{relative_path} must document {phrase}")
 
 
 def main():
@@ -366,6 +390,7 @@ def main():
         check_core_data_failure_guards,
         check_login_session_guard,
         check_docs_plans,
+        check_ci_baseline_docs,
     ]
     try:
         for check in checks:
