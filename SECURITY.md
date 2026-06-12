@@ -34,7 +34,13 @@ Helpful reports include:
 - Dependency manifests detected: Podfile, Podfile.lock. Dependency updates should preserve lockfiles when present and avoid introducing packages without a clear maintenance reason.
 - GitHub Actions runs `make check` for pushes and pull requests so the static
   Xcode, CocoaPods lock, Twitter API, and Core Data guardrails stay enforced
-  before merge.
+  before merge. The workflow uses read-only permissions, credential-free
+  checkout, immutable action pins, a bounded runtime, and structural mutation
+  tests that reject contradictory credential settings, write permissions,
+  unreviewed actions, and weakened verification commands.
+- The shared profile image helper accepts only HTTPS URLs, uses bounded request
+  duration and response size, validates successful image responses, and keeps
+  network work off the main operation queue.
 
 ## Mobile Privacy Notes
 

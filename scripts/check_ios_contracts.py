@@ -8,6 +8,8 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 
+from workflow_contract import validate as validate_workflow
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS_PLANS = ROOT / "docs/plans"
@@ -18,6 +20,8 @@ TIMELINE_TWEET_FAILURE_PLAN = DOCS_PLANS / "2026-06-09-timeline-tweet-failure-co
 TIMELINE_TWEET_PLAN = DOCS_PLANS / "2026-06-09-timeline-tweet-completion.md"
 FRIENDS_LIST_DATA_PLAN = DOCS_PLANS / "2026-06-09-friends-list-data-guard.md"
 CI_PLAN = DOCS_PLANS / "2026-06-10-ci-baseline.md"
+PROFILE_IMAGE_TRANSPORT_PLAN = DOCS_PLANS / "2026-06-10-profile-image-transport.md"
+TABLE_IMAGE_REUSE_PLAN = DOCS_PLANS / "2026-06-10-table-image-reuse.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -185,6 +189,26 @@ def check_profile_image_loading_guards():
         "handler(image: nil, error)" in picture,
         "Picture.get must report failed image downloads without crashing",
     )
+    transport_contracts = {
+        'url.scheme?.lowercaseString != "https"': "require HTTPS profile image URLs",
+        "maximumImageBytes = 5 * 1024 * 1024": "bound profile image responses to 5 MiB",
+        "cachePolicy: .ReturnCacheDataElseLoad": "use the response cache when possible",
+        "timeoutInterval: 15": "bound profile image request duration",
+        "queue: NSOperationQueue()": "download profile images off the main queue",
+        "if let httpResponse = response as? NSHTTPURLResponse": "validate HTTP responses",
+        "httpResponse.statusCode >= 200 && httpResponse.statusCode < 300": "reject non-success HTTP responses",
+        'mimeType?.hasPrefix("image/") == true': "reject non-image response bodies",
+        "data.length <= self.maximumImageBytes": "reject oversized response bodies",
+        "dispatch_async(dispatch_get_main_queue())": "deliver image completions on the main queue",
+        'description: "Profile image could not be decoded"': "report image decode failures",
+    }
+    for fragment, behavior in transport_contracts.items():
+        require(fragment in picture, f"Picture.get must {behavior}")
+    require(
+        "queue: NSOperationQueue.mainQueue()" not in picture,
+        "Picture.get must not perform profile image downloads on the main queue",
+    )
+    require("httpResponse!" not in picture, "Picture.get must not force-unwrap HTTP responses")
 
 
 def check_person_profile_image_guards():
@@ -217,6 +241,28 @@ def check_person_profile_image_guards():
     require(
         "self.peepImg!.image" not in source,
         "PersonController must not force-unwrap the profile image outlet when assigning",
+    )
+
+
+def check_table_profile_image_reuse_guards():
+    source = read_text("Twinder/TableController.swift")
+
+    for contract in (
+        "cell.peepImage.image = nil",
+        "if let imageURL = NSURL(string: fav_tweep.image_url)",
+        "if let img = newImage",
+        "if let currentIndexPath = tableView.indexPathForCell(cell)",
+        "if currentIndexPath.isEqual(indexPath)",
+    ):
+        require(contract in source, f"saved-profile table image guard is missing: {contract}")
+
+    require(
+        "NSURL(string: fav_tweep.image_url)!" not in source,
+        "saved-profile table must not force-unwrap profile image URLs",
+    )
+    require(
+        "let img: UIImage = NewImage" not in source,
+        "saved-profile table must not assign optional decoded image data directly",
     )
 
 
@@ -348,6 +394,11 @@ def check_docs_plans():
     require(TIMELINE_TWEET_PLAN in plans, f"{TIMELINE_TWEET_PLAN.relative_to(ROOT)} must be present")
     require(FRIENDS_LIST_DATA_PLAN in plans, f"{FRIENDS_LIST_DATA_PLAN.relative_to(ROOT)} must be present")
     require(CI_PLAN in plans, f"{CI_PLAN.relative_to(ROOT)} must be present")
+    require(
+        PROFILE_IMAGE_TRANSPORT_PLAN in plans,
+        f"{PROFILE_IMAGE_TRANSPORT_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(TABLE_IMAGE_REUSE_PLAN in plans, f"{TABLE_IMAGE_REUSE_PLAN.relative_to(ROOT)} must be present")
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")
@@ -358,10 +409,17 @@ def check_docs_plans():
 def check_ci_baseline_docs():
     require(CI_WORKFLOW.exists(), ".github/workflows/check.yml is missing")
     workflow = CI_WORKFLOW.read_text(encoding="utf-8")
-    require("actions/checkout@v4" in workflow, "CI workflow must check out the repository")
-    require("actions/setup-python@v5" in workflow, "CI workflow must install Python")
-    require('python-version: "3.12"' in workflow, "CI workflow must use Python 3.12")
-    require("run: make check" in workflow, "CI workflow must run make check")
+    errors = validate_workflow(workflow)
+    require(not errors, f"CI workflow must {errors[0]}" if errors else "")
+
+    makefile = read_text("Makefile")
+    require(
+        "ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile,
+        "Makefile must resolve commands from the repository root",
+    )
+    require('"$(ROOT)/scripts/check_ios_contracts.py"' in makefile, "Makefile must use the rooted checker path")
+    require('"$(ROOT)/scripts/test_workflow_contract.py"' in makefile, "Makefile must run workflow contract mutations")
+    require('cd "$(ROOT)" && xcodebuild' in makefile, "Makefile must run xcodebuild from the repository root")
 
     docs = {
         "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md"],
@@ -385,6 +443,7 @@ def main():
         check_api_json_guards,
         check_profile_image_loading_guards,
         check_person_profile_image_guards,
+        check_table_profile_image_reuse_guards,
         check_swipe_card_remote_data_guards,
         check_initial_card_data_guards,
         check_core_data_failure_guards,

@@ -24,6 +24,7 @@
 - Full baseline: `make check`
 - Combined verification: `make verify`
 - Lint/static checks: `make lint`
+- Workflow contract mutations: `make contract-test`
 - Tests: `make test`
 - Build: `make build`
 - Local Apple development: `open Twinder.xcworkspace`
@@ -40,6 +41,9 @@
 - Test-related files detected: `TwinderTests/TwinderTests.swift`
 - Start with the narrowest relevant test or Make target, then run `make check` before handing off if the change is not documentation-only.
 - Keep README verification notes in sync when commands, fixtures, or supported toolchains change.
+- Keep hosted verification read-only and credential-free with immutable action
+  pins; update the structural workflow mutations with any intentional policy
+  change.
 
 ## PR / change guidance
 

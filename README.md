@@ -3,11 +3,6 @@
 <!-- README-OVERVIEW-IMAGE -->
 ![Project overview](docs/readme-overview.svg)
 
-## Device Preview
-
-<!-- DEVICE-PREVIEW-IMAGE -->
-![Device preview](docs/device-preview.svg)
-
 ## Overview
 
 `garethpaul/twinder` is an Apple platform application or Objective-C/Swift sample. A simple application that showcases Fabric + Cocoapods
@@ -66,10 +61,17 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   timeline tweet completion, initial swipe-card data, friends-list session,
   friends-list response data, login session, and Core Data failure-path
   contract checks.
+- Shared profile image downloads require HTTPS, run off the main queue, time
+  out after 15 seconds, and reject non-success, non-image, oversized, or
+  undecodable responses before returning to UI code on the main queue.
+- Saved-profile rows clear reused images and verify that asynchronous image
+  results still belong to the row before updating the cell.
 - Completed maintenance plans live under `docs/plans` and are checked by
   `make check`.
-- GitHub Actions installs Python 3.12 and runs `make check` for pushes and
-  pull requests.
+- GitHub Actions runs the same static contracts on Python 3.10, 3.12, and 3.14
+  on Ubuntu 24.04 with read-only permissions, credential-free checkout, and
+  immutable action pins. Dependency-free mutation tests reject contradictory
+  or relocated credential settings and other workflow policy regressions.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
@@ -116,8 +118,12 @@ When the required SDK or runtime is unavailable, use static checks and source re
   swipe-card timeline tweet failure completion coverage.
 - See `docs/plans/2026-06-09-timeline-tweet-completion.md` for embedded
   timeline tweet lookup completion coverage.
-- See `docs/plans/2026-06-10-ci-baseline.md` for the hosted GitHub Actions
+- See `docs/plans/2026-06-10-ci-baseline.md` for the hosted static contract
   baseline.
+- See `docs/plans/2026-06-10-profile-image-transport.md` for the completed
+  profile image transport hardening.
+- See `docs/plans/2026-06-10-table-image-reuse.md` for saved-profile table
+  image reuse guard coverage.
 
 ## Contributing
 

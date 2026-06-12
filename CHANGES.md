@@ -2,8 +2,17 @@
 
 ## 2026-06-10
 
-- Added a GitHub Actions workflow that installs Python 3.12 and runs
-  `make check`.
+- Guarded saved-profile table image loading against malformed URLs, failed
+  decoding, and asynchronous results targeting reused cells.
+- Restricted shared profile image downloads to bounded HTTPS requests, moved
+  network work off the main queue, and validated status, media type, size, and
+  decoded image data before UI callbacks.
+- Made local checks independent of the caller's working directory and fixed the
+  hosted runner and action release annotations to reviewed versions.
+- Added a pinned, read-only GitHub Actions matrix for Python 3.10, 3.12, and
+  3.14 that runs `make check` with credential-free checkout.
+- Added dependency-free structural workflow tests that reject contradictory or
+  relocated credential settings and other CI policy regressions.
 - Extended the static contract checker and docs to require the hosted CI
   verification path.
 
