@@ -59,7 +59,7 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   parsing, profile-image loading, current-user profile image loading,
   current-user profile image failure completion, swipe-card remote-data,
   timeline tweet completion, initial swipe-card data, friends-list session,
-  friends-list response data, login session, and Core Data failure-path
+  friends-list response data, login session, saved-profile context, and Core Data failure-path
   contract checks.
 - Shared profile image downloads require HTTPS, run off the main queue, time
   out after 15 seconds, and reject non-success, non-image, oversized, or
@@ -124,6 +124,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   profile image transport hardening.
 - See `docs/plans/2026-06-10-table-image-reuse.md` for saved-profile table
   image reuse guard coverage.
+- See `docs/plans/2026-06-12-saved-profile-context-guard.md` for the guarded
+  saved-profile Core Data fetch fallback.
 
 ## Contributing
 

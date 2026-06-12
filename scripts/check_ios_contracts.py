@@ -22,6 +22,7 @@ FRIENDS_LIST_DATA_PLAN = DOCS_PLANS / "2026-06-09-friends-list-data-guard.md"
 CI_PLAN = DOCS_PLANS / "2026-06-10-ci-baseline.md"
 PROFILE_IMAGE_TRANSPORT_PLAN = DOCS_PLANS / "2026-06-10-profile-image-transport.md"
 TABLE_IMAGE_REUSE_PLAN = DOCS_PLANS / "2026-06-10-table-image-reuse.md"
+SAVED_PROFILE_CONTEXT_PLAN = DOCS_PLANS / "2026-06-12-saved-profile-context-guard.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -45,6 +46,10 @@ def load_plist(relative_path):
 
 
 def check_project_files_parse():
+    gitignore = read_text(".gitignore")
+    require("__pycache__/" in gitignore, "Python bytecode cache directories must be ignored")
+    require("*.py[cod]" in gitignore, "Python bytecode files must be ignored")
+
     app_info = load_plist("Twinder/Info.plist")
     test_info = load_plist("TwinderTests/Info.plist")
     require(app_info["UIMainStoryboardFile"] == "Main", "app must launch Main.storyboard")
@@ -266,6 +271,23 @@ def check_table_profile_image_reuse_guards():
     )
 
 
+def check_saved_profile_context_guard():
+    source = read_text("Twinder/TableController.swift")
+
+    require(
+        "managedObjectContext!.executeFetchRequest" not in source,
+        "saved-profile fetch must not force-unwrap the managed object context",
+    )
+    require(
+        "if let context = managedObjectContext" in source,
+        "saved-profile fetch must guard the managed object context",
+    )
+    require(
+        "context.executeFetchRequest(fetchRequest, error: nil)" in source,
+        "saved-profile fetch must execute through the guarded context",
+    )
+
+
 def check_swipe_card_remote_data_guards():
     source = read_text("Twinder/TweepPickerView.swift")
 
@@ -399,6 +421,10 @@ def check_docs_plans():
         f"{PROFILE_IMAGE_TRANSPORT_PLAN.relative_to(ROOT)} must be present",
     )
     require(TABLE_IMAGE_REUSE_PLAN in plans, f"{TABLE_IMAGE_REUSE_PLAN.relative_to(ROOT)} must be present")
+    require(
+        SAVED_PROFILE_CONTEXT_PLAN in plans,
+        f"{SAVED_PROFILE_CONTEXT_PLAN.relative_to(ROOT)} must be present",
+    )
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")
@@ -444,6 +470,7 @@ def main():
         check_profile_image_loading_guards,
         check_person_profile_image_guards,
         check_table_profile_image_reuse_guards,
+        check_saved_profile_context_guard,
         check_swipe_card_remote_data_guards,
         check_initial_card_data_guards,
         check_core_data_failure_guards,

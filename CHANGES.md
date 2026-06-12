@@ -1,5 +1,12 @@
 # Changes
 
+## 2026-06-12
+
+- Guarded the saved-profile Core Data fetch against an unavailable managed
+  object context so persistent-store setup failures produce an empty table
+  instead of a force-unwrap crash.
+- Ignored Python bytecode caches produced by local contract compilation.
+
 ## 2026-06-10
 
 - Guarded saved-profile table image loading against malformed URLs, failed

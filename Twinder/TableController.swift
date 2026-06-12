@@ -39,8 +39,10 @@ class TableController:UIViewController, UITableViewDataSource, UITableViewDelega
         let fetchRequest = NSFetchRequest(entityName: "FavTweets")
 
         // If we can find some favs return them
-        if let fetchResults = managedObjectContext!.executeFetchRequest(fetchRequest, error: nil) as? [FavTweets] {
-            return fetchResults
+        if let context = managedObjectContext {
+            if let fetchResults = context.executeFetchRequest(fetchRequest, error: nil) as? [FavTweets] {
+                return fetchResults
+            }
         }
 
         // Return empty if there are no results
