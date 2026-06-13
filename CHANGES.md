@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-13
+
+- Cleared swipe-card profile images before loading and weakly bound late image
+  completions to the card's current profile URL before UI assignment.
+
 ## 2026-06-12
 
 - Guarded the saved-profile Core Data fetch against an unavailable managed

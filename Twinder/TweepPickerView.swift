@@ -66,13 +66,20 @@ class TweepPickerView : MDCSwipeToChooseView {
     }
 
     func loadImageView() {
+        self.imageView.image = nil
         if let selectedTweep = self.tweep {
             let pic = Picture()
             let urlString = selectedTweep.image
             if let imageURL = NSURL(string: urlString) {
-                pic.get(imageURL, {image, error in
-                    if let loadedImage = image {
-                        self.imageView.image = loadedImage
+                pic.get(imageURL, {[weak self] image, error in
+                    if let strongSelf = self {
+                        if let currentTweep = strongSelf.tweep {
+                            if currentTweep.image == urlString {
+                                if let loadedImage = image {
+                                    strongSelf.imageView.image = loadedImage
+                                }
+                            }
+                        }
                     }
                 })
             }

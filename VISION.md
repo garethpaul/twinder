@@ -25,6 +25,7 @@ Priority:
 - Skip malformed Twitter API records instead of crashing
 - Avoid force-unwrapping remote profile image URLs or decoded image data
 - Keep reused saved-profile rows from displaying stale asynchronous images
+- Keep swipe cards from retaining or displaying stale asynchronous images
 - Require bounded HTTPS transport and validated responses for shared profile
   image downloads
 - Guard current-user profile image loading before using session or image data

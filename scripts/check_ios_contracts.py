@@ -23,6 +23,7 @@ CI_PLAN = DOCS_PLANS / "2026-06-10-ci-baseline.md"
 PROFILE_IMAGE_TRANSPORT_PLAN = DOCS_PLANS / "2026-06-10-profile-image-transport.md"
 TABLE_IMAGE_REUSE_PLAN = DOCS_PLANS / "2026-06-10-table-image-reuse.md"
 SAVED_PROFILE_CONTEXT_PLAN = DOCS_PLANS / "2026-06-12-saved-profile-context-guard.md"
+SWIPE_CARD_IMAGE_IDENTITY_PLAN = DOCS_PLANS / "2026-06-13-swipe-card-image-identity.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -271,6 +272,40 @@ def check_table_profile_image_reuse_guards():
     )
 
 
+def check_swipe_card_image_identity_guard():
+    source = read_text("Twinder/TweepPickerView.swift")
+    contracts = (
+        "self.imageView.image = nil",
+        "pic.get(imageURL, {[weak self] image, error in",
+        "if let strongSelf = self",
+        "if let currentTweep = strongSelf.tweep",
+        "if currentTweep.image == urlString",
+        "if let loadedImage = image",
+        "strongSelf.imageView.image = loadedImage",
+    )
+    for contract in contracts:
+        require(contract in source, f"swipe-card image identity guard is missing: {contract}")
+
+    ordered_contracts = (
+        "self.imageView.image = nil",
+        "pic.get(imageURL, {[weak self] image, error in",
+        "if let strongSelf = self",
+        "if let currentTweep = strongSelf.tweep",
+        "if currentTweep.image == urlString",
+        "if let loadedImage = image",
+        "strongSelf.imageView.image = loadedImage",
+    )
+    positions = [source.index(contract) for contract in ordered_contracts]
+    require(
+        positions == sorted(positions),
+        "swipe-card image reset, weak capture, identity, decode, and assignment guards must stay ordered",
+    )
+    require(
+        "self.imageView.image = loadedImage" not in source,
+        "swipe-card image completion must not strongly capture the card",
+    )
+
+
 def check_saved_profile_context_guard():
     source = read_text("Twinder/TableController.swift")
 
@@ -470,6 +505,7 @@ def main():
         check_profile_image_loading_guards,
         check_person_profile_image_guards,
         check_table_profile_image_reuse_guards,
+        check_swipe_card_image_identity_guard,
         check_saved_profile_context_guard,
         check_swipe_card_remote_data_guards,
         check_initial_card_data_guards,

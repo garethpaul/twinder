@@ -41,6 +41,8 @@ Helpful reports include:
 - The shared profile image helper accepts only HTTPS URLs, uses bounded request
   duration and response size, validates successful image responses, and keeps
   network work off the main operation queue.
+- Swipe-card image completions weakly capture the card and verify that its
+  current profile URL still matches the request before updating UI state.
 
 ## Mobile Privacy Notes
 
