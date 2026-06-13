@@ -25,6 +25,7 @@ TABLE_IMAGE_REUSE_PLAN = DOCS_PLANS / "2026-06-10-table-image-reuse.md"
 SAVED_PROFILE_CONTEXT_PLAN = DOCS_PLANS / "2026-06-12-saved-profile-context-guard.md"
 SWIPE_CARD_IMAGE_IDENTITY_PLAN = DOCS_PLANS / "2026-06-13-swipe-card-image-identity.md"
 SWIPE_CARD_IMAGE_CANCELLATION_PLAN = DOCS_PLANS / "2026-06-13-swipe-card-image-cancellation.md"
+SAFE_TWITTER_DEEP_LINK_PLAN = DOCS_PLANS / "2026-06-13-safe-twitter-deep-link.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -472,6 +473,43 @@ def check_login_session_guard():
     )
 
 
+def check_twitter_deep_link_guard():
+    source = read_text("Twinder/DeepLinks.swift")
+
+    contracts = {
+        "let components = NSURLComponents()": "build Twitter deep links with URL components",
+        'components.scheme = "twitter"': "keep the fixed Twitter URL scheme",
+        'components.host = "user"': "keep the fixed Twitter user route",
+        'NSURLQueryItem(name: "screen_name", value: screen_name)': "encode the screen name as one query item",
+        "if let url = components.URL": "fail closed when URL construction fails",
+        "UIApplication.sharedApplication().canOpenURL(url)": "check app routing before opening",
+        "UIApplication.sharedApplication().openURL(url)": "open the validated bound URL",
+    }
+    for fragment, behavior in contracts.items():
+        require(fragment in source, f"DeepLinks must {behavior}")
+
+    require(
+        '"twitter://user?screen_name=" + screen_name' not in source,
+        "DeepLinks must not concatenate screen names into URL syntax",
+    )
+    require("url!" not in source, "DeepLinks must not force-unwrap constructed URLs")
+    require(
+        source.index("if let url = components.URL")
+        < source.index("UIApplication.sharedApplication().canOpenURL(url)")
+        < source.index("UIApplication.sharedApplication().openURL(url)"),
+        "DeepLinks must construct, validate, and open the same URL in order",
+    )
+
+    documentation = {
+        "README.md": "Twitter profile deep links encode the screen name as a query item",
+        "SECURITY.md": "Twitter profile routes build the screen name as a URL query item",
+        "VISION.md": "Encode Twitter profile deep-link query values",
+        "CHANGES.md": "Built Twitter profile deep links from fixed URL components",
+    }
+    for relative_path, phrase in documentation.items():
+        require(phrase in read_text(relative_path), f"{relative_path} must document safe Twitter deep links")
+
+
 def check_docs_plans():
     require(DOCS_PLANS.is_dir(), "docs/plans must exist")
     plans = sorted(DOCS_PLANS.glob("*.md"))
@@ -499,6 +537,10 @@ def check_docs_plans():
     require(
         SWIPE_CARD_IMAGE_CANCELLATION_PLAN in plans,
         f"{SWIPE_CARD_IMAGE_CANCELLATION_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(
+        SAFE_TWITTER_DEEP_LINK_PLAN in plans,
+        f"{SAFE_TWITTER_DEEP_LINK_PLAN.relative_to(ROOT)} must be present",
     )
 
     for plan in plans:
@@ -551,6 +593,7 @@ def main():
         check_initial_card_data_guards,
         check_core_data_failure_guards,
         check_login_session_guard,
+        check_twitter_deep_link_guard,
         check_docs_plans,
         check_ci_baseline_docs,
     ]

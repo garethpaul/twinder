@@ -72,6 +72,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   before applying a late completion. Replacement loads and released cards
   cancel their active task, and request generations reject older same-URL
   completions.
+- Twitter profile deep links encode the screen name as a query item, avoid URL
+  force unwraps, and open only when iOS accepts the constructed route.
 - Completed maintenance plans live under `docs/plans` and are checked by
   `make check`.
 - GitHub Actions runs the same static contracts on Python 3.10, 3.12, and 3.14
@@ -136,6 +138,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   identity-checked swipe-card image completions.
 - See `docs/plans/2026-06-13-swipe-card-image-cancellation.md` for cancellable
   swipe-card image tasks and same-URL generation guards.
+- See `docs/plans/2026-06-13-safe-twitter-deep-link.md` for encoded,
+  fail-closed Twitter profile routing.
 
 ## Contributing
 

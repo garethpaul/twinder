@@ -44,6 +44,8 @@ Helpful reports include:
 - Swipe-card image completions weakly capture the card and verify that its
   current profile URL and request generation still match before updating UI
   state; replacement loads and card release cancel the active task.
+- Twitter profile routes build the screen name as a URL query item and open
+  only a successfully constructed URL that iOS reports as supported.
 
 ## Mobile Privacy Notes
 

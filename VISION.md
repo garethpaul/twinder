@@ -28,6 +28,8 @@ Priority:
 - Keep swipe cards from retaining or displaying stale asynchronous images
 - Cancel replaced or released swipe-card image tasks and reject older same-URL
   request generations
+- Encode Twitter profile deep-link query values and fail closed when the route
+  cannot be constructed or opened
 - Require bounded HTTPS transport and validated responses for shared profile
   image downloads
 - Guard current-user profile image loading before using session or image data

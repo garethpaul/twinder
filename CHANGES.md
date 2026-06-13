@@ -2,6 +2,8 @@
 
 ## 2026-06-13
 
+- Built Twitter profile deep links from fixed URL components and an encoded
+  screen-name query item, removing optional URL force unwraps.
 - Replaced legacy swipe-card image connections with cancellable URLSession
   tasks owned by the card and cancelled on replacement or release.
 - Added request-generation checks so older same-URL completions cannot clear or
