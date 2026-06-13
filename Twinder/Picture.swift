@@ -13,11 +13,11 @@ class Picture{
         )
     }
 
-    func get(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void))
+    func get(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void)) -> NSURLSessionDataTask?
     {
         if url.scheme?.lowercaseString != "https" {
             handler(image: nil, downloadError(1, description: "Profile images must use HTTPS"))
-            return
+            return nil
         }
 
         let imageRequest = NSURLRequest(
@@ -25,9 +25,8 @@ class Picture{
             cachePolicy: .ReturnCacheDataElseLoad,
             timeoutInterval: 15
         )
-        NSURLConnection.sendAsynchronousRequest(imageRequest,
-            queue: NSOperationQueue(),
-            completionHandler:{response, data, error in
+        let imageTask = NSURLSession.sharedSession().dataTaskWithRequest(imageRequest,
+            completionHandler:{data, response, error in
                 if error != nil || data == nil {
                     dispatch_async(dispatch_get_main_queue()) {
                         handler(image: nil, error)
@@ -54,5 +53,7 @@ class Picture{
                     handler(image: nil, responseError)
                 }
         })
+        imageTask.resume()
+        return imageTask
     }
 }

@@ -5,7 +5,7 @@ date: 2026-06-13
 
 # Cancel Stale Swipe-Card Image Requests
 
-## Status: In Progress
+## Status: Completed
 
 ## Context
 
@@ -62,9 +62,14 @@ the same URL can still accept an older completion.
 
 ## Verification
 
-- Focused cancellation contract and full `make check`
-- External-directory and space-containing-path portable checks
-- Hostile mutations for task return/resume, replacement/deinit cancellation,
-  generation identity, task clearing, legacy API removal, and plan status
+- `python3 -B -c '...check_profile_image_loading_guards();
+  check_swipe_card_image_identity_guard()'` passed the focused cancellation and
+  generation contracts.
+- Full local, external-directory, and space-containing-path `make check` runs
+  passed 16 static groups and 17 workflow mutations; Xcode remains unavailable
+  on Linux.
+- Ten hostile mutations covering task return/resume, replacement/deinit
+  cancellation, generation identity, task clearing, legacy API removal, and
+  stale plan status were rejected.
 - Python syntax, workflow contracts, SVG XML, `git diff --check`, generated-
-  artifact, and focused secret review
+  artifact, and focused secret reviews are included in final validation.

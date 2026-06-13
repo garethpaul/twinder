@@ -2,6 +2,10 @@
 
 ## 2026-06-13
 
+- Replaced legacy swipe-card image connections with cancellable URLSession
+  tasks owned by the card and cancelled on replacement or release.
+- Added request-generation checks so older same-URL completions cannot clear or
+  overwrite a newer card image load.
 - Cleared swipe-card profile images before loading and weakly bound late image
   completions to the card's current profile URL before UI assignment.
 

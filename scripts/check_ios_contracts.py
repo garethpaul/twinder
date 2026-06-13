@@ -24,6 +24,7 @@ PROFILE_IMAGE_TRANSPORT_PLAN = DOCS_PLANS / "2026-06-10-profile-image-transport.
 TABLE_IMAGE_REUSE_PLAN = DOCS_PLANS / "2026-06-10-table-image-reuse.md"
 SAVED_PROFILE_CONTEXT_PLAN = DOCS_PLANS / "2026-06-12-saved-profile-context-guard.md"
 SWIPE_CARD_IMAGE_IDENTITY_PLAN = DOCS_PLANS / "2026-06-13-swipe-card-image-identity.md"
+SWIPE_CARD_IMAGE_CANCELLATION_PLAN = DOCS_PLANS / "2026-06-13-swipe-card-image-cancellation.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -184,8 +185,8 @@ def check_profile_image_loading_guards():
         "ViewController must guard decoded profile images before assignment",
     )
     require(
-        "func get(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void))" in picture,
-        "Picture.get must expose optional decoded images",
+        "func get(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void)) -> NSURLSessionDataTask?" in picture,
+        "Picture.get must expose optional decoded images and return a cancellable task",
     )
     require(
         "UIImage(data: data)!" not in picture,
@@ -200,7 +201,9 @@ def check_profile_image_loading_guards():
         "maximumImageBytes = 5 * 1024 * 1024": "bound profile image responses to 5 MiB",
         "cachePolicy: .ReturnCacheDataElseLoad": "use the response cache when possible",
         "timeoutInterval: 15": "bound profile image request duration",
-        "queue: NSOperationQueue()": "download profile images off the main queue",
+        "NSURLSession.sharedSession().dataTaskWithRequest(imageRequest": "download profile images with URLSession",
+        "imageTask.resume()": "start the profile image task explicitly",
+        "return imageTask": "return the cancellable profile image task",
         "if let httpResponse = response as? NSHTTPURLResponse": "validate HTTP responses",
         "httpResponse.statusCode >= 200 && httpResponse.statusCode < 300": "reject non-success HTTP responses",
         'mimeType?.hasPrefix("image/") == true': "reject non-image response bodies",
@@ -210,10 +213,7 @@ def check_profile_image_loading_guards():
     }
     for fragment, behavior in transport_contracts.items():
         require(fragment in picture, f"Picture.get must {behavior}")
-    require(
-        "queue: NSOperationQueue.mainQueue()" not in picture,
-        "Picture.get must not perform profile image downloads on the main queue",
-    )
+    require("NSURLConnection" not in picture, "Picture.get must not retain the legacy connection API")
     require("httpResponse!" not in picture, "Picture.get must not force-unwrap HTTP responses")
 
 
@@ -275,9 +275,17 @@ def check_table_profile_image_reuse_guards():
 def check_swipe_card_image_identity_guard():
     source = read_text("Twinder/TweepPickerView.swift")
     contracts = (
+        "private var imageTask: NSURLSessionDataTask?",
+        "private var imageRequestGeneration = 0",
+        "deinit {",
+        "imageTask?.cancel()",
+        "imageRequestGeneration += 1",
+        "let requestGeneration = imageRequestGeneration",
         "self.imageView.image = nil",
-        "pic.get(imageURL, {[weak self] image, error in",
+        "imageTask = pic.get(imageURL, {[weak self] image, error in",
         "if let strongSelf = self",
+        "if strongSelf.imageRequestGeneration == requestGeneration",
+        "strongSelf.imageTask = nil",
         "if let currentTweep = strongSelf.tweep",
         "if currentTweep.image == urlString",
         "if let loadedImage = image",
@@ -288,8 +296,10 @@ def check_swipe_card_image_identity_guard():
 
     ordered_contracts = (
         "self.imageView.image = nil",
-        "pic.get(imageURL, {[weak self] image, error in",
+        "imageTask = pic.get(imageURL, {[weak self] image, error in",
         "if let strongSelf = self",
+        "if strongSelf.imageRequestGeneration == requestGeneration",
+        "strongSelf.imageTask = nil",
         "if let currentTweep = strongSelf.tweep",
         "if currentTweep.image == urlString",
         "if let loadedImage = image",
@@ -303,6 +313,28 @@ def check_swipe_card_image_identity_guard():
     require(
         "self.imageView.image = loadedImage" not in source,
         "swipe-card image completion must not strongly capture the card",
+    )
+    require(
+        source.count("imageTask?.cancel()") >= 2,
+        "swipe-card image tasks must be cancelled on replacement and deinitialization",
+    )
+    load_source = source[source.index("func loadImageView()") : source.index("func constructNameLabel()")]
+    lifecycle_contracts = (
+        "imageTask?.cancel()",
+        "imageTask = nil",
+        "imageRequestGeneration += 1",
+        "let requestGeneration = imageRequestGeneration",
+        "self.imageView.image = nil",
+        "imageTask = pic.get(imageURL, {[weak self] image, error in",
+        "if strongSelf.imageRequestGeneration == requestGeneration",
+        "strongSelf.imageTask = nil",
+        "if currentTweep.image == urlString",
+        "strongSelf.imageView.image = loadedImage",
+    )
+    lifecycle_positions = [load_source.index(contract) for contract in lifecycle_contracts]
+    require(
+        lifecycle_positions == sorted(lifecycle_positions),
+        "swipe-card cancellation, generation, identity, and assignment guards must stay ordered",
     )
 
 
@@ -459,6 +491,14 @@ def check_docs_plans():
     require(
         SAVED_PROFILE_CONTEXT_PLAN in plans,
         f"{SAVED_PROFILE_CONTEXT_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(
+        SWIPE_CARD_IMAGE_IDENTITY_PLAN in plans,
+        f"{SWIPE_CARD_IMAGE_IDENTITY_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(
+        SWIPE_CARD_IMAGE_CANCELLATION_PLAN in plans,
+        f"{SWIPE_CARD_IMAGE_CANCELLATION_PLAN.relative_to(ROOT)} must be present",
     )
 
     for plan in plans:

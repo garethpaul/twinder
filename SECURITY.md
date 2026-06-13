@@ -40,9 +40,10 @@ Helpful reports include:
   unreviewed actions, and weakened verification commands.
 - The shared profile image helper accepts only HTTPS URLs, uses bounded request
   duration and response size, validates successful image responses, and keeps
-  network work off the main operation queue.
+  network work in cancellable URLSession tasks off the main operation queue.
 - Swipe-card image completions weakly capture the card and verify that its
-  current profile URL still matches the request before updating UI state.
+  current profile URL and request generation still match before updating UI
+  state; replacement loads and card release cancel the active task.
 
 ## Mobile Privacy Notes
 
