@@ -1,6 +1,6 @@
 # Legacy Xcode And TwitterKit Setup Notes
 
-## Status: Planned
+## Status: Completed
 
 ## Context
 
@@ -32,11 +32,13 @@ boundaries needed to understand or attempt historical reproduction.
 
 ## Verification
 
-- focused static setup-note and metadata contracts
-- repository and external-directory `make check`
-- hostile deployment-target, CocoaPods, swipe dependency, framework-version,
-  documentation, suite, roadmap, and plan-status mutations
-- final artifact, credential, exact-diff, and hosted static-check audits
+- Focused static setup-note and metadata contracts passed.
+- The repository and external-directory `make check` passed.
+- Eight hostile legacy-setup mutations were rejected across deployment-target,
+  CocoaPods, swipe dependency, framework-version, documentation, suite,
+  roadmap, and plan-status contracts.
+- Final artifact, credential, exact-diff, and hosted static-check audits remain
+  the shipping gate.
 
 ## Scope Boundary
 

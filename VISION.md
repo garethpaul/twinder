@@ -46,10 +46,11 @@ Priority:
 - Keep CI runners and third-party actions pinned to reviewed versions
 - Keep hosted verification read-only, credential-free, and structurally
   protected against workflow policy regressions
+- Keep historical Xcode, CocoaPods, TwitterKit, Fabric, iOS target, and Swift
+  compatibility notes tied to checked-in metadata
 
 Next priorities:
 
-- Add setup notes for Xcode, CocoaPods, and legacy TwitterKit requirements
 - Document current API limitations before any revival work
 - Add broader tests or manual verification notes for like/skip persistence
 - Modernize Swift in a dedicated compatibility pass

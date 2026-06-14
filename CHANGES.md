@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-06-14
+
+- Documented the historical Xcode project format, iOS 8.0/8.2 targets,
+  CocoaPods 0.35.0, MDCSwipeToChoose 0.2.1, TwitterKit 1.2.0, Fabric 1.1.1,
+  pre-modern Swift syntax, and retired-service compatibility boundary.
+
 ## 2026-06-13
 
 - Built Twitter profile deep links from fixed URL components and an encoded

@@ -27,6 +27,7 @@ SWIPE_CARD_IMAGE_IDENTITY_PLAN = DOCS_PLANS / "2026-06-13-swipe-card-image-ident
 SWIPE_CARD_IMAGE_CANCELLATION_PLAN = DOCS_PLANS / "2026-06-13-swipe-card-image-cancellation.md"
 SAFE_TWITTER_DEEP_LINK_PLAN = DOCS_PLANS / "2026-06-13-safe-twitter-deep-link.md"
 MAKE_ROOT_PROTECTION_PLAN = DOCS_PLANS / "2026-06-14-make-root-override-protection.md"
+LEGACY_SETUP_NOTES_PLAN = DOCS_PLANS / "2026-06-14-legacy-setup-notes.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -77,6 +78,52 @@ def check_pod_lock_integrity():
     project = read_text("Twinder.xcodeproj/project.pbxproj")
     require("TwinderTests.swift in Sources" in project, "test source must remain in the Xcode project")
     require("Pods-Twinder.debug.xcconfig" in project, "CocoaPods debug xcconfig must remain referenced")
+
+
+def check_legacy_setup_metadata():
+    project = read_text("Twinder.xcodeproj/project.pbxproj")
+    podfile_lock = read_text("Podfile.lock")
+    twitterkit_info = load_plist("TwitterKit.framework/Versions/A/Resources/Info.plist")
+    fabric_info = load_plist("Fabric.framework/Versions/A/Resources/Info.plist")
+
+    require('compatibilityVersion = "Xcode 3.2";' in project, "project must retain its Xcode 3.2 format")
+    require(
+        project.count("IPHONEOS_DEPLOYMENT_TARGET = 8.0;") == 2,
+        "project must retain both iOS 8.0 deployment targets",
+    )
+    require(
+        project.count("IPHONEOS_DEPLOYMENT_TARGET = 8.2;") == 2,
+        "project must retain both iOS 8.2 deployment targets",
+    )
+    require("MDCSwipeToChoose (0.2.1)" in podfile_lock, "Pod lock must pin MDCSwipeToChoose 0.2.1")
+    require("COCOAPODS: 0.35.0" in podfile_lock, "Pod lock must record CocoaPods 0.35.0")
+    require(
+        twitterkit_info["CFBundleShortVersionString"] == "1.2.0",
+        "vendored TwitterKit must remain version 1.2.0",
+    )
+    require(
+        fabric_info["CFBundleShortVersionString"] == "1.1.1",
+        "vendored Fabric must remain version 1.1.1",
+    )
+
+    documentation = {
+        "README.md": [
+            "Legacy Toolchain Boundary",
+            "CocoaPods 0.35.0",
+            "MDCSwipeToChoose 0.2.1",
+            "TwitterKit 1.2.0",
+            "Fabric 1.1.1",
+            "pre-modern language dialect",
+            "service dependencies are retired",
+            "docs/plans/2026-06-14-legacy-setup-notes.md",
+        ],
+        "VISION.md": ["Keep historical Xcode, CocoaPods, TwitterKit, Fabric"],
+        "CHANGES.md": ["CocoaPods 0.35.0", "retired-service compatibility boundary"],
+    }
+    for relative_path, phrases in documentation.items():
+        text = read_text(relative_path)
+        for phrase in phrases:
+            require(phrase in text, f"{relative_path} must document {phrase}")
 
 
 def check_tweep_picture_json_guard():
@@ -547,6 +594,10 @@ def check_docs_plans():
         MAKE_ROOT_PROTECTION_PLAN in plans,
         f"{MAKE_ROOT_PROTECTION_PLAN.relative_to(ROOT)} must be present",
     )
+    require(
+        LEGACY_SETUP_NOTES_PLAN in plans,
+        f"{LEGACY_SETUP_NOTES_PLAN.relative_to(ROOT)} must be present",
+    )
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")
@@ -588,6 +639,7 @@ def main():
     checks = [
         check_project_files_parse,
         check_pod_lock_integrity,
+        check_legacy_setup_metadata,
         check_tweep_picture_json_guard,
         check_tweep_picture_failure_completion,
         check_api_json_guards,

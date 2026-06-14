@@ -34,8 +34,24 @@ Additional scan context:
 ### Prerequisites
 
 - Git
-- macOS with Xcode for building Apple platform projects
-- CocoaPods if dependencies need to be installed
+- macOS with a historical Xcode/Swift toolchain for any native build attempt
+- CocoaPods 0.35.0 if the locked dependencies must be reproduced
+
+### Legacy Toolchain Boundary
+
+- The Xcode project uses the Xcode 3.2-compatible project format and records
+  iOS deployment targets 8.0 and 8.2.
+- `Podfile.lock` pins CocoaPods 0.35.0 and MDCSwipeToChoose 0.2.1.
+- The repository vendors TwitterKit 1.2.0 and Fabric 1.1.1 frameworks.
+- The Swift source uses a pre-modern language dialect. Current Xcode may require
+  a dedicated migration before it can compile the project.
+- TwitterKit, Fabric, and their service dependencies are retired. A native
+  build does not prove that login, API, deep-link, or timeline behavior still
+  works against current services.
+
+The checked-in Xcode project, `Podfile.lock`, and framework metadata are the
+sources of truth for this historical boundary. Do not add credentials while
+attempting reproduction.
 
 ### Setup
 
@@ -140,6 +156,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   swipe-card image tasks and same-URL generation guards.
 - See `docs/plans/2026-06-13-safe-twitter-deep-link.md` for encoded,
   fail-closed Twitter profile routing.
+- See `docs/plans/2026-06-14-legacy-setup-notes.md` for the historical Xcode,
+  CocoaPods, TwitterKit, Fabric, and Swift compatibility boundary.
 
 ## Contributing
 
