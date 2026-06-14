@@ -26,6 +26,7 @@ SAVED_PROFILE_CONTEXT_PLAN = DOCS_PLANS / "2026-06-12-saved-profile-context-guar
 SWIPE_CARD_IMAGE_IDENTITY_PLAN = DOCS_PLANS / "2026-06-13-swipe-card-image-identity.md"
 SWIPE_CARD_IMAGE_CANCELLATION_PLAN = DOCS_PLANS / "2026-06-13-swipe-card-image-cancellation.md"
 SAFE_TWITTER_DEEP_LINK_PLAN = DOCS_PLANS / "2026-06-13-safe-twitter-deep-link.md"
+MAKE_ROOT_PROTECTION_PLAN = DOCS_PLANS / "2026-06-14-make-root-override-protection.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -542,6 +543,10 @@ def check_docs_plans():
         SAFE_TWITTER_DEEP_LINK_PLAN in plans,
         f"{SAFE_TWITTER_DEEP_LINK_PLAN.relative_to(ROOT)} must be present",
     )
+    require(
+        MAKE_ROOT_PROTECTION_PLAN in plans,
+        f"{MAKE_ROOT_PROTECTION_PLAN.relative_to(ROOT)} must be present",
+    )
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")
@@ -556,10 +561,12 @@ def check_ci_baseline_docs():
     require(not errors, f"CI workflow must {errors[0]}" if errors else "")
 
     makefile = read_text("Makefile")
+    makefile_lines = set(makefile.splitlines())
     require(
-        "ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile,
-        "Makefile must resolve commands from the repository root",
+        "override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile_lines,
+        "Makefile must protect commands rooted at the repository",
     )
+    require("PYTHON ?= python3" in makefile_lines, "Makefile must preserve the Python command override")
     require('"$(ROOT)/scripts/check_ios_contracts.py"' in makefile, "Makefile must use the rooted checker path")
     require('"$(ROOT)/scripts/test_workflow_contract.py"' in makefile, "Makefile must run workflow contract mutations")
     require('cd "$(ROOT)" && xcodebuild' in makefile, "Makefile must run xcodebuild from the repository root")
