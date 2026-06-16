@@ -5,7 +5,7 @@ date: 2026-06-16
 
 # Cancel Stale Saved-Profile Image Requests
 
-## Status: Planned
+## Status: Completed
 
 ## Context
 
@@ -19,7 +19,7 @@ and an older completion for the same row identity can still race a newer load.
 - R1. Give each `TweepCell` ownership of its active optional
   `NSURLSessionDataTask`.
 - R2. Cancel and clear the owned task before a replacement load and during
-  `prepareForReuse()`.
+  `prepareForReuse()`, and cancel remaining work when the cell is released.
 - R3. Increment a cell-local request generation for replacement and reuse so
   older completions cannot finish a newer load for the same row.
 - R4. Accept a returned task only while its generation is still current;
@@ -76,3 +76,14 @@ and an older completion for the same row identity can still race a newer load.
 - Audit the exact diff, generated artifacts, conflict markers, modes,
   whitespace, and credential patterns before shipping.
 - Capture one bounded exact-head hosted snapshot after push without polling.
+
+## Verification Completed
+
+- Pre-change inspection confirmed `TableController` ignored the returned image
+  task and `TweepCell` had no cancellation or generation lifecycle.
+- repository and external-directory `make check` passed all static contracts
+  and workflow mutations; Linux truthfully reported `xcodebuild` unavailable.
+- hostile saved-profile image mutations were rejected.
+- generated-artifact and credential-pattern audits passed.
+- No native Xcode build, simulator, Twitter service, profile-image network, Core
+  Data runtime, credentials, or deployment was exercised.

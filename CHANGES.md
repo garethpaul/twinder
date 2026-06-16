@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-16
+
+- Reused saved-profile cells cancel obsolete image tasks and reject stale
+  completions.
+
 ## 2026-06-14
 
 - Documented the historical Xcode project format, iOS 8.0/8.2 targets,

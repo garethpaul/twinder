@@ -59,6 +59,7 @@
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
 - See `docs/plans/2026-06-08-twinder-baseline.md` for the current static verification baseline.
+- Reused saved-profile cells cancel obsolete image tasks and reject stale completions.
 - See `docs/plans/2026-06-08-profile-image-loading-guards.md` for profile-card image URL and decode guard coverage.
 - `Pods/` is vendored dependency code; do not hand-edit it unless intentionally updating dependencies.
 

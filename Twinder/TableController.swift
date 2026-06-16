@@ -111,31 +111,35 @@ class TableController:UIViewController, UITableViewDataSource, UITableViewDelega
         // Work through the fav_tweets based on their index e.g. FavTweets[0] - first fav
         if let fav_tweep = self.fav_tweeps[indexPath.item] as FavTweets! {
 
-            // Clear any image left behind by a reused cell.
-            cell.peepImage.image = nil
+            let imageRequestGeneration = cell.beginImageLoad()
 
             // Create a new instance of picture (see Functions/Picture.swift)
             let pic = Picture()
 
             // Send HTTP request to get the image
             if let imageURL = NSURL(string: fav_tweep.image_url) {
-                pic.get(imageURL, {newImage, error in
-                    if let img = newImage {
-                        if let currentIndexPath = tableView.indexPathForCell(cell) {
-                            if currentIndexPath.isEqual(indexPath) {
-                                let width = img.size.width;
-                                let height = img.size.height;
-                                let screenWidth = self.view.frame.size.width;
-                                let apect = width/height;
-                                let nHeight = screenWidth/apect;
+                let imageTask = pic.get(imageURL, {[weak cell] newImage, error in
+                    if let strongCell = cell {
+                        if strongCell.finishImageLoad(imageRequestGeneration) {
+                            if let img = newImage {
+                                if let currentIndexPath = tableView.indexPathForCell(strongCell) {
+                                    if currentIndexPath.isEqual(indexPath) {
+                                        let width = img.size.width;
+                                        let height = img.size.height;
+                                        let screenWidth = self.view.frame.size.width;
+                                        let apect = width/height;
+                                        let nHeight = screenWidth/apect;
 
-                                cell.peepImage.frame = CGRectMake(0, 0, screenWidth, nHeight);
-                                cell.peepImage.center = self.view.center;
-                                cell.peepImage.image = img;
+                                        strongCell.peepImage.frame = CGRectMake(0, 0, screenWidth, nHeight);
+                                        strongCell.peepImage.center = self.view.center;
+                                        strongCell.peepImage.image = img;
+                                    }
+                                }
                             }
                         }
                     }
                 })
+                cell.ownImageTask(imageTask, generation: imageRequestGeneration)
             }
 
             // Don't allow the images to overflow the cell

@@ -41,6 +41,8 @@ Helpful reports include:
 - The shared profile image helper accepts only HTTPS URLs, uses bounded request
   duration and response size, validates successful image responses, and keeps
   network work in cancellable URLSession tasks off the main operation queue.
+- Reused saved-profile cells cancel obsolete image tasks and reject stale
+  completions.
 - Swipe-card image completions weakly capture the card and verify that its
   current profile URL and request generation still match before updating UI
   state; replacement loads and card release cancel the active task.

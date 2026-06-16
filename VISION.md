@@ -25,6 +25,8 @@ Priority:
 - Skip malformed Twitter API records instead of crashing
 - Avoid force-unwrapping remote profile image URLs or decoded image data
 - Keep reused saved-profile rows from displaying stale asynchronous images
+- Reused saved-profile cells cancel obsolete image tasks and reject stale
+  completions.
 - Keep swipe cards from retaining or displaying stale asynchronous images
 - Cancel replaced or released swipe-card image tasks and reject older same-URL
   request generations

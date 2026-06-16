@@ -83,6 +83,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   undecodable responses before returning to UI code on the main queue.
 - Saved-profile rows clear reused images and verify that asynchronous image
   results still belong to the row before updating the cell.
+- Reused saved-profile cells cancel obsolete image tasks and reject stale
+  completions.
 - Swipe cards clear old profile images, weakly capture the card during image
   loading, and verify the requested URL still belongs to the current profile
   before applying a late completion. Replacement loads and released cards

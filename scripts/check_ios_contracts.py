@@ -28,6 +28,7 @@ SWIPE_CARD_IMAGE_CANCELLATION_PLAN = DOCS_PLANS / "2026-06-13-swipe-card-image-c
 SAFE_TWITTER_DEEP_LINK_PLAN = DOCS_PLANS / "2026-06-13-safe-twitter-deep-link.md"
 MAKE_ROOT_PROTECTION_PLAN = DOCS_PLANS / "2026-06-14-make-root-override-protection.md"
 LEGACY_SETUP_NOTES_PLAN = DOCS_PLANS / "2026-06-14-legacy-setup-notes.md"
+SAVED_PROFILE_IMAGE_CANCELLATION_PLAN = DOCS_PLANS / "2026-06-16-saved-profile-image-cancellation.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -301,15 +302,55 @@ def check_person_profile_image_guards():
 
 def check_table_profile_image_reuse_guards():
     source = read_text("Twinder/TableController.swift")
+    cell_source = read_text("Twinder/TweepCell.swift")
 
     for contract in (
-        "cell.peepImage.image = nil",
+        "let imageRequestGeneration = cell.beginImageLoad()",
         "if let imageURL = NSURL(string: fav_tweep.image_url)",
+        "let imageTask = pic.get(imageURL, {[weak cell] newImage, error in",
+        "if let strongCell = cell",
+        "if strongCell.finishImageLoad(imageRequestGeneration)",
         "if let img = newImage",
-        "if let currentIndexPath = tableView.indexPathForCell(cell)",
+        "if let currentIndexPath = tableView.indexPathForCell(strongCell)",
         "if currentIndexPath.isEqual(indexPath)",
+        "cell.ownImageTask(imageTask, generation: imageRequestGeneration)",
     ):
         require(contract in source, f"saved-profile table image guard is missing: {contract}")
+
+    for contract in (
+        "private var imageTask: NSURLSessionDataTask?",
+        "private var imageRequestGeneration = 0",
+        "override func prepareForReuse()",
+        "super.prepareForReuse()",
+        "func beginImageLoad() -> Int",
+        "func ownImageTask(task: NSURLSessionDataTask?, generation: Int)",
+        "func finishImageLoad(generation: Int) -> Bool",
+        "if imageRequestGeneration == generation",
+        "task?.cancel()",
+    ):
+        require(contract in cell_source, f"saved-profile cell image lifecycle is missing: {contract}")
+    require(
+        cell_source.count("imageTask?.cancel()") >= 3,
+        "saved-profile cells must cancel image tasks on replacement, reuse, and release",
+    )
+    require(
+        cell_source.count("imageRequestGeneration += 1") >= 2,
+        "saved-profile cells must invalidate generations on replacement and reuse",
+    )
+    load_contracts = (
+        "let imageRequestGeneration = cell.beginImageLoad()",
+        "let imageTask = pic.get(imageURL, {[weak cell] newImage, error in",
+        "if strongCell.finishImageLoad(imageRequestGeneration)",
+        "if let currentIndexPath = tableView.indexPathForCell(strongCell)",
+        "if currentIndexPath.isEqual(indexPath)",
+        "strongCell.peepImage.image = img",
+        "cell.ownImageTask(imageTask, generation: imageRequestGeneration)",
+    )
+    positions = [source.index(contract) for contract in load_contracts]
+    require(
+        positions == sorted(positions),
+        "saved-profile task ownership, generation, identity, assignment, and adoption guards must stay ordered",
+    )
 
     require(
         "NSURL(string: fav_tweep.image_url)!" not in source,
@@ -598,6 +639,19 @@ def check_docs_plans():
         LEGACY_SETUP_NOTES_PLAN in plans,
         f"{LEGACY_SETUP_NOTES_PLAN.relative_to(ROOT)} must be present",
     )
+    require(
+        SAVED_PROFILE_IMAGE_CANCELLATION_PLAN in plans,
+        f"{SAVED_PROFILE_IMAGE_CANCELLATION_PLAN.relative_to(ROOT)} must be present",
+    )
+
+    cancellation_plan = SAVED_PROFILE_IMAGE_CANCELLATION_PLAN.read_text(encoding="utf-8")
+    for evidence in (
+        "Status: Completed",
+        "repository and external-directory `make check` passed",
+        "hostile saved-profile image mutations were rejected",
+        "generated-artifact and credential-pattern audits passed",
+    ):
+        require(evidence in cancellation_plan, f"saved-profile cancellation plan must record {evidence}")
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")
@@ -633,6 +687,13 @@ def check_ci_baseline_docs():
         text = read_text(relative_path)
         for phrase in required_phrases:
             require(phrase in text, f"{relative_path} must document {phrase}")
+
+    for relative_path in ("AGENTS.md", "README.md", "VISION.md", "SECURITY.md", "CHANGES.md"):
+        text = " ".join(read_text(relative_path).split())
+        require(
+            "Reused saved-profile cells cancel obsolete image tasks and reject stale completions." in text,
+            f"{relative_path} must document saved-profile image cancellation",
+        )
 
 
 def main():
