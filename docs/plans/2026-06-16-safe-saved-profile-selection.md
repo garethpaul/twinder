@@ -5,7 +5,7 @@ date: 2026-06-16
 
 # Guard Saved-Profile Table Selection
 
-## Status: Planned
+## Status: Completed
 
 ## Context
 
@@ -70,3 +70,12 @@ crash before the safe Twitter deep-link helper is reached.
 - Audit the exact diff, generated artifacts, conflict markers, modes,
   whitespace, large files, and credential patterns before shipping.
 - Capture one bounded exact-head hosted snapshot after push without polling.
+
+## Verification Completed
+
+- Pre-change source was rejected and hostile saved-profile selection mutations were rejected.
+- repository and external-directory `make check` passed all static contracts
+  and workflow mutations; Linux truthfully reported `xcodebuild` unavailable.
+- generated-artifact and credential-pattern audits passed.
+- No native Xcode build, simulator, Twitter app, Core Data runtime, credentials,
+  or deployment was exercised.

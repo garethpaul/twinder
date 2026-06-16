@@ -4,6 +4,7 @@
 
 - Reused saved-profile cells cancel obsolete image tasks and reject stale
   completions.
+- Saved-profile selection validates table identity before opening Twitter.
 
 ## 2026-06-14
 

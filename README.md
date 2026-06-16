@@ -85,6 +85,7 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   results still belong to the row before updating the cell.
 - Reused saved-profile cells cancel obsolete image tasks and reject stale
   completions.
+- Saved-profile selection validates table identity before opening Twitter.
 - Swipe cards clear old profile images, weakly capture the card during image
   loading, and verify the requested URL still belongs to the current profile
   before applying a late completion. Replacement loads and released cards

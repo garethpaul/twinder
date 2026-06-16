@@ -79,15 +79,12 @@ class TableController:UIViewController, UITableViewDataSource, UITableViewDelega
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-
-        let indexPath = tableView.indexPathForSelectedRow();
-        let currentCell = tableView.cellForRowAtIndexPath(indexPath!) as TweepCell;
-        if let selected_tweep = self.fav_tweeps[indexPath!.item] as FavTweets! {
-
-            // if the row is selected do a deep link to open the twitter app/website to find the given user.
-            twtrScreenName(selected_tweep.screen_name)
+        if indexPath.section != 0 || indexPath.item < 0 || indexPath.item >= self.fav_tweeps.count {
+            return
         }
-        
+
+        let selectedTweep = self.fav_tweeps[indexPath.item]
+        twtrScreenName(selectedTweep.screen_name)
     }
 
 

@@ -7,6 +7,7 @@ lint:
 	$(PYTHON) "$(ROOT)/scripts/check_ios_contracts.py"
 
 test: lint
+	$(PYTHON) "$(ROOT)/scripts/test_saved_profile_selection_contract.py"
 
 contract-test:
 	$(PYTHON) "$(ROOT)/scripts/test_workflow_contract.py"
