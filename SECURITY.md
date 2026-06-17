@@ -44,6 +44,8 @@ Helpful reports include:
 - Reused saved-profile cells cancel obsolete image tasks and reject stale
   completions.
 - Saved-profile selection validates table identity before opening Twitter.
+- Saved-profile writes persist before publishing success. A missing Core Data
+  context or failed save must not update the in-memory saved-profile list.
 - Swipe-card image completions weakly capture the card and verify that its
   current profile URL and request generation still match before updating UI
   state; replacement loads and card release cancel the active task.

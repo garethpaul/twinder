@@ -75,8 +75,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   parsing, profile-image loading, current-user profile image loading,
   current-user profile image failure completion, swipe-card remote-data,
   timeline tweet completion, initial swipe-card data, friends-list session,
-  friends-list response data, login session, saved-profile context, and Core Data failure-path
-  contract checks.
+  friends-list response data, login session, saved-profile context,
+  saved-profile write transactions, and Core Data failure-path contract checks.
 - Shared profile image downloads require HTTPS, run through cancellable
   URLSession tasks off the main queue, time
   out after 15 seconds, and reject non-success, non-image, oversized, or
@@ -86,6 +86,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 - Reused saved-profile cells cancel obsolete image tasks and reject stale
   completions.
 - Saved-profile selection validates table identity before opening Twitter.
+- Saved-profile writes persist before publishing success. Missing Core Data
+  contexts and failed saves leave both durable and in-memory favorites
+  unchanged.
 - Swipe cards clear old profile images, weakly capture the card during image
   loading, and verify the requested URL still belongs to the current profile
   before applying a late completion. Replacement loads and released cards

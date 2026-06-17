@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 
 from workflow_contract import validate as validate_workflow
 from saved_profile_selection_contract import validation_errors as selection_validation_errors
+from saved_profile_write_contract import validation_errors as write_validation_errors
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,6 +32,7 @@ MAKE_ROOT_PROTECTION_PLAN = DOCS_PLANS / "2026-06-14-make-root-override-protecti
 LEGACY_SETUP_NOTES_PLAN = DOCS_PLANS / "2026-06-14-legacy-setup-notes.md"
 SAVED_PROFILE_IMAGE_CANCELLATION_PLAN = DOCS_PLANS / "2026-06-16-saved-profile-image-cancellation.md"
 SAFE_SAVED_PROFILE_SELECTION_PLAN = DOCS_PLANS / "2026-06-16-safe-saved-profile-selection.md"
+SAVED_PROFILE_WRITE_PLAN = DOCS_PLANS / "2026-06-17-saved-profile-write-transaction.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -453,6 +455,12 @@ def check_saved_profile_selection_guard():
     require(not errors, errors[0] if errors else "")
 
 
+def check_saved_profile_write_guard():
+    source = read_text("Twinder/TweepPickerViewController.swift")
+    errors = write_validation_errors(source)
+    require(not errors, errors[0] if errors else "")
+
+
 def check_swipe_card_remote_data_guards():
     source = read_text("Twinder/TweepPickerView.swift")
 
@@ -655,6 +663,10 @@ def check_docs_plans():
         SAFE_SAVED_PROFILE_SELECTION_PLAN in plans,
         f"{SAFE_SAVED_PROFILE_SELECTION_PLAN.relative_to(ROOT)} must be present",
     )
+    require(
+        SAVED_PROFILE_WRITE_PLAN in plans,
+        f"{SAVED_PROFILE_WRITE_PLAN.relative_to(ROOT)} must be present",
+    )
 
     cancellation_plan = SAVED_PROFILE_IMAGE_CANCELLATION_PLAN.read_text(encoding="utf-8")
     for evidence in (
@@ -673,6 +685,15 @@ def check_docs_plans():
         "generated-artifact and credential-pattern audits passed",
     ):
         require(evidence in selection_plan, f"saved-profile selection plan must record {evidence}")
+
+    write_plan = SAVED_PROFILE_WRITE_PLAN.read_text(encoding="utf-8")
+    for evidence in (
+        "Status: Completed",
+        "repository and external-directory `make check` passed",
+        "hostile saved-profile write mutations were rejected",
+        "generated-artifact and credential-pattern audits passed",
+    ):
+        require(evidence in write_plan, f"saved-profile write plan must record {evidence}")
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")
@@ -719,6 +740,10 @@ def check_ci_baseline_docs():
             "Saved-profile selection validates table identity before opening Twitter." in text,
             f"{relative_path} must document saved-profile selection validation",
         )
+        require(
+            "Saved-profile writes persist before publishing success." in text,
+            f"{relative_path} must document saved-profile write transactions",
+        )
 
 
 def main():
@@ -735,6 +760,7 @@ def main():
         check_swipe_card_image_identity_guard,
         check_saved_profile_context_guard,
         check_saved_profile_selection_guard,
+        check_saved_profile_write_guard,
         check_swipe_card_remote_data_guards,
         check_initial_card_data_guards,
         check_core_data_failure_guards,

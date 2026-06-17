@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-06-17
+
+- Saved-profile writes persist before publishing success. Liked profiles now
+  fail closed when Core Data is unavailable, clean up failed inserts, and enter
+  in-memory state only after a successful context save.
+
 ## 2026-06-16
 
 - Reused saved-profile cells cancel obsolete image tasks and reject stale

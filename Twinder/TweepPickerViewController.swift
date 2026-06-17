@@ -103,18 +103,33 @@ class TweepPickerViewController: UIViewController, MDCSwipeToChooseDelegate {
     }
 
 
-    func saveTweep(tweep: Tweep) -> Void {
+    func saveTweep(tweep: Tweep) -> Bool {
 
-        // Once you swipe to like a tweep store the data in corestorage
-        let newTweet = NSEntityDescription.insertNewObjectForEntityForName("FavTweets", inManagedObjectContext: self.managedObjectContext!) as FavTweets
+        if let context = self.managedObjectContext {
+            // Once you swipe to like a tweep store the data in corestorage
+            let insertedObject = NSEntityDescription.insertNewObjectForEntityForName("FavTweets", inManagedObjectContext: context)
+            if let newTweet = insertedObject as? FavTweets {
 
-        // Save the variables into corestorage see Modes/FavTweets.swift for details
-        newTweet.screen_name = tweep.screen_name
-        newTweet.image_url = tweep.image
-        newTweet.name = tweep.name
+                // Save the variables into corestorage see Modes/FavTweets.swift for details
+                newTweet.screen_name = tweep.screen_name
+                newTweet.image_url = tweep.image
+                newTweet.name = tweep.name
 
-        // Store the saved tweep into an array
-        self.savedTweeps.append(tweep)
+                var error: NSError? = nil
+                if !context.save(&error) {
+                    context.deleteObject(newTweet)
+                    return false
+                }
+
+                // Store the saved tweep into an array after durable persistence succeeds
+                self.savedTweeps.append(tweep)
+                return true
+            }
+
+            context.deleteObject(insertedObject)
+        }
+
+        return false
     }
 
     func skipTweep(tweep: Tweep) -> Void {
@@ -126,15 +141,16 @@ class TweepPickerViewController: UIViewController, MDCSwipeToChooseDelegate {
         // If there is a swipe perform an action on direction
         let tpv = view as TweepPickerView
         if (direction == MDCSwipeDirection.Right) {
-            if(tpv.tweep != nil) {
-                saveTweep(tpv.tweep!)
+            if let selectedTweep = tpv.tweep {
+                if saveTweep(selectedTweep) {
+                    println("Tweep saved!")
+                }
             }
-            println("Tweep saved!")
         } else {
 
             // User must have swiped left :-)
-            if(tpv.tweep != nil) {
-                skipTweep(tpv.tweep!)
+            if let skippedTweep = tpv.tweep {
+                skipTweep(skippedTweep)
             }
             println("Tweep skipped!")
         }

@@ -28,6 +28,7 @@ Priority:
 - Reused saved-profile cells cancel obsolete image tasks and reject stale
   completions.
 - Saved-profile selection validates table identity before opening Twitter.
+- Saved-profile writes persist before publishing success.
 - Keep swipe cards from retaining or displaying stale asynchronous images
 - Cancel replaced or released swipe-card image tasks and reject older same-URL
   request generations
