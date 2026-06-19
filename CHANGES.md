@@ -1,5 +1,19 @@
 # Changes
 
+## 2026-06-19
+
+- Isolated each saved-profile insertion in its own Core Data context and rolled
+  back failed writes so the shared view context does not remain dirty.
+- Matched `FavTweets` properties to the optional Core Data schema and guarded
+  missing persisted handles and image URLs before table use.
+- Rejected empty, oversized, non-ASCII Twitter handles before deep-link URL
+  construction.
+- Removed owned saved-profile overlays before reconfiguring reused table cells.
+- Limited the native Make gate to the Xcode 6 toolchain required by the
+  pre-versioned Swift sources and mutation-tested the skip contract.
+- Replaced the original developer-home bridging-header path with a portable
+  repository-relative Xcode build setting.
+
 ## 2026-06-17
 
 - Saved-profile writes persist before publishing success. Liked profiles now

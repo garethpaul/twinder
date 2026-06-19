@@ -60,8 +60,11 @@
 - See `VISION.md` for project direction and contribution guardrails.
 - See `docs/plans/2026-06-08-twinder-baseline.md` for the current static verification baseline.
 - Reused saved-profile cells cancel obsolete image tasks and reject stale completions.
+- Reused saved-profile cells remove owned overlays before reconfiguration.
 - Saved-profile selection validates table identity before opening Twitter.
-- Saved-profile writes persist before publishing success.
+- Saved-profile writes persist before publishing success. Use an isolated context and roll back failures.
+- Persisted optional favorite fields must be bound before use.
+- Twitter deep links accept only ASCII handles of 1-15 characters.
 - See `docs/plans/2026-06-08-profile-image-loading-guards.md` for profile-card image URL and decode guard coverage.
 - `Pods/` is vendored dependency code; do not hand-edit it unless intentionally updating dependencies.
 

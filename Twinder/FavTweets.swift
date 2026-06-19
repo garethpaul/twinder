@@ -11,8 +11,8 @@ import CoreData
 
 class FavTweets: NSManagedObject {
 
-    @NSManaged var screen_name: String
-    @NSManaged var image_url: String
-    @NSManaged var name: String
+    @NSManaged var screen_name: String?
+    @NSManaged var image_url: String?
+    @NSManaged var name: String?
 
 }

@@ -10,7 +10,12 @@ import xml.etree.ElementTree as ET
 
 from workflow_contract import validate as validate_workflow
 from saved_profile_selection_contract import validation_errors as selection_validation_errors
+from saved_profile_cell_contract import validation_errors as cell_validation_errors
+from saved_profile_model_contract import validation_errors as model_validation_errors
 from saved_profile_write_contract import validation_errors as write_validation_errors
+from deep_link_contract import validation_errors as deep_link_validation_errors
+from legacy_build_contract import validation_errors as build_validation_errors
+from project_path_contract import validation_errors as project_path_validation_errors
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -310,7 +315,8 @@ def check_table_profile_image_reuse_guards():
 
     for contract in (
         "let imageRequestGeneration = cell.beginImageLoad()",
-        "if let imageURL = NSURL(string: fav_tweep.image_url)",
+        "if let imageURLString = fav_tweep.image_url",
+        "if let imageURL = NSURL(string: imageURLString)",
         "let imageTask = pic.get(imageURL, {[weak cell] newImage, error in",
         "if let strongCell = cell",
         "if strongCell.finishImageLoad(imageRequestGeneration)",
@@ -357,7 +363,7 @@ def check_table_profile_image_reuse_guards():
     )
 
     require(
-        "NSURL(string: fav_tweep.image_url)!" not in source,
+        "fav_tweep.image_url!" not in source,
         "saved-profile table must not force-unwrap profile image URLs",
     )
     require(
@@ -452,6 +458,19 @@ def check_saved_profile_context_guard():
 def check_saved_profile_selection_guard():
     source = read_text("Twinder/TableController.swift")
     errors = selection_validation_errors(source)
+    require(not errors, errors[0] if errors else "")
+
+
+def check_saved_profile_cell_lifecycle():
+    source = read_text("Twinder/TableController.swift")
+    errors = cell_validation_errors(source)
+    require(not errors, errors[0] if errors else "")
+
+
+def check_saved_profile_model_boundary():
+    model_source = read_text("Twinder/FavTweets.swift")
+    table_source = read_text("Twinder/TableController.swift")
+    errors = model_validation_errors(model_source, table_source)
     require(not errors, errors[0] if errors else "")
 
 
@@ -581,6 +600,9 @@ def check_login_session_guard():
 def check_twitter_deep_link_guard():
     source = read_text("Twinder/DeepLinks.swift")
 
+    errors = deep_link_validation_errors(source)
+    require(not errors, errors[0] if errors else "")
+
     contracts = {
         "let components = NSURLComponents()": "build Twitter deep links with URL components",
         'components.scheme = "twitter"': "keep the fixed Twitter URL scheme",
@@ -708,6 +730,11 @@ def check_ci_baseline_docs():
     require(not errors, f"CI workflow must {errors[0]}" if errors else "")
 
     makefile = read_text("Makefile")
+    build_errors = build_validation_errors(makefile)
+    require(not build_errors, build_errors[0] if build_errors else "")
+    project_source = read_text("Twinder.xcodeproj/project.pbxproj")
+    project_errors = project_path_validation_errors(project_source)
+    require(not project_errors, project_errors[0] if project_errors else "")
     makefile_lines = set(makefile.splitlines())
     require(
         "override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile_lines,
@@ -760,6 +787,8 @@ def main():
         check_swipe_card_image_identity_guard,
         check_saved_profile_context_guard,
         check_saved_profile_selection_guard,
+        check_saved_profile_cell_lifecycle,
+        check_saved_profile_model_boundary,
         check_saved_profile_write_guard,
         check_swipe_card_remote_data_guards,
         check_initial_card_data_guards,

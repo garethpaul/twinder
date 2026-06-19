@@ -27,13 +27,16 @@ Priority:
 - Keep reused saved-profile rows from displaying stale asynchronous images
 - Reused saved-profile cells cancel obsolete image tasks and reject stale
   completions.
+- Reused saved-profile cells remove owned overlays before reconfiguration.
 - Saved-profile selection validates table identity before opening Twitter.
-- Saved-profile writes persist before publishing success.
+- Saved-profile writes persist before publishing success. Use an isolated
+  context, and bind optional legacy fields before use.
 - Keep swipe cards from retaining or displaying stale asynchronous images
 - Cancel replaced or released swipe-card image tasks and reject older same-URL
   request generations
-- Encode Twitter profile deep-link query values and fail closed when the route
-  cannot be constructed or opened
+- Encode Twitter profile deep-link query values, validate the ASCII handle
+  alphabet and length, and fail closed when the route cannot be constructed or
+  opened
 - Require bounded HTTPS transport and validated responses for shared profile
   image downloads
 - Guard current-user profile image loading before using session or image data
@@ -46,6 +49,7 @@ Priority:
 - Keep failed or cancelled TwitterKit logins on the login screen without
   logging auth details
 - Avoid aborting on local Core Data store or save failures
+- Keep failed favorite inserts isolated from the shared view context
 - Keep GitHub Actions aligned with the local Python `make check` baseline
 - Keep CI runners and third-party actions pinned to reviewed versions
 - Keep hosted verification read-only, credential-free, and structurally

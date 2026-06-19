@@ -105,9 +105,12 @@ class TweepPickerViewController: UIViewController, MDCSwipeToChooseDelegate {
 
     func saveTweep(tweep: Tweep) -> Bool {
 
-        if let context = self.managedObjectContext {
+        if let coordinator = self.managedObjectContext?.persistentStoreCoordinator {
+            let writeContext = NSManagedObjectContext()
+            writeContext.persistentStoreCoordinator = coordinator
+
             // Once you swipe to like a tweep store the data in corestorage
-            let insertedObject = NSEntityDescription.insertNewObjectForEntityForName("FavTweets", inManagedObjectContext: context)
+            let insertedObject = NSEntityDescription.insertNewObjectForEntityForName("FavTweets", inManagedObjectContext: writeContext)
             if let newTweet = insertedObject as? FavTweets {
 
                 // Save the variables into corestorage see Modes/FavTweets.swift for details
@@ -116,8 +119,8 @@ class TweepPickerViewController: UIViewController, MDCSwipeToChooseDelegate {
                 newTweet.name = tweep.name
 
                 var error: NSError? = nil
-                if !context.save(&error) {
-                    context.deleteObject(newTweet)
+                if !writeContext.save(&error) {
+                    writeContext.rollback()
                     return false
                 }
 
@@ -126,7 +129,7 @@ class TweepPickerViewController: UIViewController, MDCSwipeToChooseDelegate {
                 return true
             }
 
-            context.deleteObject(insertedObject)
+            writeContext.rollback()
         }
 
         return false

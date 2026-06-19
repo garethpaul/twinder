@@ -43,14 +43,18 @@ Helpful reports include:
   network work in cancellable URLSession tasks off the main operation queue.
 - Reused saved-profile cells cancel obsolete image tasks and reject stale
   completions.
+- Reused saved-profile cells remove owned overlays before reconfiguration.
 - Saved-profile selection validates table identity before opening Twitter.
 - Saved-profile writes persist before publishing success. A missing Core Data
   context or failed save must not update the in-memory saved-profile list.
+  Writes use an isolated context and rollback, and optional persisted fields
+  are guarded before use.
 - Swipe-card image completions weakly capture the card and verify that its
   current profile URL and request generation still match before updating UI
   state; replacement loads and card release cancel the active task.
 - Twitter profile routes build the screen name as a URL query item and open
-  only a successfully constructed URL that iOS reports as supported.
+  only a successfully constructed URL that iOS reports as supported after the
+  handle passes the ASCII Twitter alphabet and length checks.
 
 ## Mobile Privacy Notes
 

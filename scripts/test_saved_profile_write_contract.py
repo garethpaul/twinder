@@ -14,14 +14,24 @@ if errors:
     raise AssertionError(f"baseline saved-profile write invalid: {errors}")
 
 mutations = {
-    "missing context guard": baseline.replace(
-        "if let context = self.managedObjectContext",
-        "if self.managedObjectContext != nil",
+    "missing coordinator guard": baseline.replace(
+        "if let coordinator = self.managedObjectContext?.persistentStoreCoordinator",
+        "if self.managedObjectContext?.persistentStoreCoordinator != nil",
         1,
     ),
-    "force-unwrapped insertion context": baseline.replace(
-        "inManagedObjectContext: context",
+    "force-unwrapped coordinator": baseline.replace(
+        "writeContext.persistentStoreCoordinator = coordinator",
+        "writeContext.persistentStoreCoordinator = self.managedObjectContext!.persistentStoreCoordinator",
+        1,
+    ),
+    "shared insertion context": baseline.replace(
+        "inManagedObjectContext: writeContext",
         "inManagedObjectContext: self.managedObjectContext!",
+        1,
+    ),
+    "missing isolated context": baseline.replace(
+        "            let writeContext = NSManagedObjectContext()\n",
+        "",
         1,
     ),
     "missing field population": baseline.replace(
@@ -35,12 +45,12 @@ mutations = {
         1,
     ),
     "missing persistence attempt": baseline.replace(
-        "if !context.save(&error)",
+        "if !writeContext.save(&error)",
         "if error != nil",
         1,
     ),
-    "missing failed-insert cleanup": baseline.replace(
-        "                context.deleteObject(newTweet)\n",
+    "missing failed-write rollback": baseline.replace(
+        "                writeContext.rollback()\n",
         "",
         1,
     ),
@@ -52,8 +62,8 @@ mutations = {
     "append before save": baseline.replace(
         "            self.savedTweeps.append(tweep)\n", "", 1
     ).replace(
-        "            if !context.save(&error) {\n",
-        "            self.savedTweeps.append(tweep)\n            if !context.save(&error) {\n",
+        "            if !writeContext.save(&error) {\n",
+        "            self.savedTweeps.append(tweep)\n            if !writeContext.save(&error) {\n",
         1,
     ),
     "force-unwrapped selected profile": baseline.replace(
@@ -69,6 +79,11 @@ mutations = {
     "missing success result": baseline.replace(
         "            return true\n",
         "            return false\n",
+        1,
+    ),
+    "missing unexpected-entity rollback": baseline.replace(
+        "            writeContext.rollback()\n        }\n\n        return false",
+        "        }\n\n        return false",
         1,
     ),
 }

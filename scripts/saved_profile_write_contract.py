@@ -28,23 +28,32 @@ def validation_errors(source):
         return ["saved-profile writes must not force-unwrap context or selected profile"]
 
     save_contracts = (
-        "if let context = self.managedObjectContext",
-        'let insertedObject = NSEntityDescription.insertNewObjectForEntityForName("FavTweets", inManagedObjectContext: context)',
+        "if let coordinator = self.managedObjectContext?.persistentStoreCoordinator",
+        "let writeContext = NSManagedObjectContext()",
+        "writeContext.persistentStoreCoordinator = coordinator",
+        'let insertedObject = NSEntityDescription.insertNewObjectForEntityForName("FavTweets", inManagedObjectContext: writeContext)',
         "if let newTweet = insertedObject as? FavTweets",
         "newTweet.screen_name = tweep.screen_name",
         "newTweet.image_url = tweep.image",
         "newTweet.name = tweep.name",
         "var error: NSError? = nil",
-        "if !context.save(&error)",
-        "context.deleteObject(newTweet)",
+        "if !writeContext.save(&error)",
+        "writeContext.rollback()",
         "return false",
         "self.savedTweeps.append(tweep)",
         "return true",
-        "context.deleteObject(insertedObject)",
     )
     positions = [save_handler.find(contract) for contract in save_contracts]
     if any(position < 0 for position in positions) or positions != sorted(positions):
-        return ["saved-profile writes must guard, persist, clean up, then publish success"]
+        return ["saved-profile writes must isolate, persist, roll back, then publish success"]
+
+    if "inManagedObjectContext: context" in save_handler:
+        return ["saved-profile writes must not mutate the shared view context"]
+
+    first_rollback = save_handler.find("writeContext.rollback()")
+    second_rollback = save_handler.find("writeContext.rollback()", first_rollback + 1)
+    if second_rollback < save_handler.find("return true"):
+        return ["saved-profile writes must roll back failed and unexpected insertions"]
 
     caller_contracts = (
         "if let selectedTweep = tpv.tweep",

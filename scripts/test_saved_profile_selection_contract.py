@@ -32,6 +32,11 @@ mutations = {
         "        let indexPath = tableView.indexPathForSelectedRow()!\n        if indexPath.section",
         1,
     ),
+    "force-unwrapped persisted handle": baseline.replace(
+        "        if let screenName = selectedTweep.screen_name {\n            twtrScreenName(screenName)\n        }",
+        "        twtrScreenName(selectedTweep.screen_name!)",
+        1,
+    ),
 }
 
 for description, source in mutations.items():

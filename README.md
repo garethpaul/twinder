@@ -67,7 +67,10 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 
 - Open `Twinder.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
 - Run `make check` for static project and Twitter API parsing checks. The build
-  step runs Xcode only on hosts where `xcodebuild` is installed.
+  step runs the native build only with the compatible Xcode 6 toolchain; modern
+  Xcode releases report the documented legacy skip instead of attempting an
+  unsupported Swift migration. The checked-in bridge header path is relative
+  to the repository rather than an individual developer home directory.
 
 ## Testing and Verification
 
@@ -85,17 +88,21 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   results still belong to the row before updating the cell.
 - Reused saved-profile cells cancel obsolete image tasks and reject stale
   completions.
+- Reused saved-profile cells remove their owned name and border overlays before
+  reconfiguration instead of accumulating duplicate subviews.
 - Saved-profile selection validates table identity before opening Twitter.
 - Saved-profile writes persist before publishing success. Missing Core Data
   contexts and failed saves leave both durable and in-memory favorites
-  unchanged.
+  unchanged. Each insertion uses an isolated context and rollback, while
+  optional legacy fields are bound before table use.
 - Swipe cards clear old profile images, weakly capture the card during image
   loading, and verify the requested URL still belongs to the current profile
   before applying a late completion. Replacement loads and released cards
   cancel their active task, and request generations reject older same-URL
   completions.
 - Twitter profile deep links encode the screen name as a query item, avoid URL
-  force unwraps, and open only when iOS accepts the constructed route.
+  force unwraps, reject handles outside the 1-15 character ASCII Twitter
+  alphabet, and open only when iOS accepts the constructed route.
 - Completed maintenance plans live under `docs/plans` and are checked by
   `make check`.
 - GitHub Actions runs the same static contracts on Python 3.10, 3.12, and 3.14
