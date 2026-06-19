@@ -13,6 +13,9 @@ import CoreData
 
 class TableController:UIViewController, UITableViewDataSource, UITableViewDelegate {
 
+    private let savedProfileHeaderTag = 1001
+    private let savedProfileBorderTag = 1002
+
     // MARK: IBOutlet
     // TableView inside ViewController
     @IBOutlet var tableView: UITableView!
@@ -39,8 +42,10 @@ class TableController:UIViewController, UITableViewDataSource, UITableViewDelega
         let fetchRequest = NSFetchRequest(entityName: "FavTweets")
 
         // If we can find some favs return them
-        if let fetchResults = managedObjectContext!.executeFetchRequest(fetchRequest, error: nil) as? [FavTweets] {
-            return fetchResults
+        if let context = managedObjectContext {
+            if let fetchResults = context.executeFetchRequest(fetchRequest, error: nil) as? [FavTweets] {
+                return fetchResults
+            }
         }
 
         // Return empty if there are no results
@@ -77,15 +82,14 @@ class TableController:UIViewController, UITableViewDataSource, UITableViewDelega
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-
-        let indexPath = tableView.indexPathForSelectedRow();
-        let currentCell = tableView.cellForRowAtIndexPath(indexPath!) as TweepCell;
-        if let selected_tweep = self.fav_tweeps[indexPath!.item] as FavTweets! {
-
-            // if the row is selected do a deep link to open the twitter app/website to find the given user.
-            twtrScreenName(selected_tweep.screen_name)
+        if indexPath.section != 0 || indexPath.item < 0 || indexPath.item >= self.fav_tweeps.count {
+            return
         }
-        
+
+        let selectedTweep = self.fav_tweeps[indexPath.item]
+        if let screenName = selectedTweep.screen_name {
+            twtrScreenName(screenName)
+        }
     }
 
 
@@ -109,31 +113,40 @@ class TableController:UIViewController, UITableViewDataSource, UITableViewDelega
         // Work through the fav_tweets based on their index e.g. FavTweets[0] - first fav
         if let fav_tweep = self.fav_tweeps[indexPath.item] as FavTweets! {
 
-            // Clear any image left behind by a reused cell.
-            cell.peepImage.image = nil
+            cell.viewWithTag(savedProfileHeaderTag)?.removeFromSuperview()
+            cell.viewWithTag(savedProfileBorderTag)?.removeFromSuperview()
+
+            let imageRequestGeneration = cell.beginImageLoad()
 
             // Create a new instance of picture (see Functions/Picture.swift)
             let pic = Picture()
 
             // Send HTTP request to get the image
-            if let imageURL = NSURL(string: fav_tweep.image_url) {
-                pic.get(imageURL, {newImage, error in
-                    if let img = newImage {
-                        if let currentIndexPath = tableView.indexPathForCell(cell) {
-                            if currentIndexPath.isEqual(indexPath) {
-                                let width = img.size.width;
-                                let height = img.size.height;
-                                let screenWidth = self.view.frame.size.width;
-                                let apect = width/height;
-                                let nHeight = screenWidth/apect;
+            if let imageURLString = fav_tweep.image_url {
+                if let imageURL = NSURL(string: imageURLString) {
+                    let imageTask = pic.get(imageURL, {[weak cell] newImage, error in
+                        if let strongCell = cell {
+                            if strongCell.finishImageLoad(imageRequestGeneration) {
+                                if let img = newImage {
+                                    if let currentIndexPath = tableView.indexPathForCell(strongCell) {
+                                        if currentIndexPath.isEqual(indexPath) {
+                                            let width = img.size.width;
+                                            let height = img.size.height;
+                                            let screenWidth = self.view.frame.size.width;
+                                            let apect = width/height;
+                                            let nHeight = screenWidth/apect;
 
-                                cell.peepImage.frame = CGRectMake(0, 0, screenWidth, nHeight);
-                                cell.peepImage.center = self.view.center;
-                                cell.peepImage.image = img;
+                                            strongCell.peepImage.frame = CGRectMake(0, 0, screenWidth, nHeight);
+                                            strongCell.peepImage.center = self.view.center;
+                                            strongCell.peepImage.image = img;
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
-                })
+                    })
+                    cell.ownImageTask(imageTask, generation: imageRequestGeneration)
+                }
             }
 
             // Don't allow the images to overflow the cell
@@ -142,6 +155,7 @@ class TableController:UIViewController, UITableViewDataSource, UITableViewDelega
             //  Append a header to the cell to show the tweep's name above the image.
             let screen_width = self.view.frame.size.width
             let headerView: UIView = UIView(frame: CGRectMake(0,0,screen_width,50))
+            headerView.tag = savedProfileHeaderTag
             headerView.backgroundColor = toColor("000000")
             headerView.alpha = CGFloat(55)
 
@@ -156,6 +170,7 @@ class TableController:UIViewController, UITableViewDataSource, UITableViewDelega
 
             // Create a larger border to the bottom of the cell
             let headerBackgroundLabel: UILabel = UILabel(frame: CGRectMake(0,220,screen_width,20))
+            headerBackgroundLabel.tag = savedProfileBorderTag
             headerBackgroundLabel.backgroundColor = toColor("5E41A3")
             cell.addSubview(headerBackgroundLabel)
         }

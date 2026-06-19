@@ -1,5 +1,55 @@
 # Changes
 
+## 2026-06-19
+
+- Isolated each saved-profile insertion in its own Core Data context and rolled
+  back failed writes so the shared view context does not remain dirty.
+- Matched `FavTweets` properties to the optional Core Data schema and guarded
+  missing persisted handles and image URLs before table use.
+- Rejected empty, oversized, non-ASCII Twitter handles before deep-link URL
+  construction.
+- Removed owned saved-profile overlays before reconfiguring reused table cells.
+- Limited the native Make gate to the Xcode 6 toolchain required by the
+  pre-versioned Swift sources and mutation-tested the skip contract.
+- Replaced the original developer-home bridging-header path with a portable
+  repository-relative Xcode build setting.
+
+## 2026-06-17
+
+- Saved-profile writes persist before publishing success. Liked profiles now
+  fail closed when Core Data is unavailable, clean up failed inserts, and enter
+  in-memory state only after a successful context save.
+
+## 2026-06-16
+
+- Reused saved-profile cells cancel obsolete image tasks and reject stale
+  completions.
+- Saved-profile selection validates table identity before opening Twitter.
+
+## 2026-06-14
+
+- Documented the historical Xcode project format, iOS 8.0/8.2 targets,
+  CocoaPods 0.35.0, MDCSwipeToChoose 0.2.1, TwitterKit 1.2.0, Fabric 1.1.1,
+  pre-modern Swift syntax, and retired-service compatibility boundary.
+
+## 2026-06-13
+
+- Built Twitter profile deep links from fixed URL components and an encoded
+  screen-name query item, removing optional URL force unwraps.
+- Replaced legacy swipe-card image connections with cancellable URLSession
+  tasks owned by the card and cancelled on replacement or release.
+- Added request-generation checks so older same-URL completions cannot clear or
+  overwrite a newer card image load.
+- Cleared swipe-card profile images before loading and weakly bound late image
+  completions to the card's current profile URL before UI assignment.
+
+## 2026-06-12
+
+- Guarded the saved-profile Core Data fetch against an unavailable managed
+  object context so persistent-store setup failures produce an empty table
+  instead of a force-unwrap crash.
+- Ignored Python bytecode caches produced by local contract compilation.
+
 ## 2026-06-10
 
 - Guarded saved-profile table image loading against malformed URLs, failed
@@ -10,7 +60,9 @@
 - Made local checks independent of the caller's working directory and fixed the
   hosted runner and action release annotations to reviewed versions.
 - Added a pinned, read-only GitHub Actions matrix for Python 3.10, 3.12, and
-  3.14 that runs `make check`.
+  3.14 that runs `make check` with credential-free checkout.
+- Added dependency-free structural workflow tests that reject contradictory or
+  relocated credential settings and other CI policy regressions.
 - Extended the static contract checker and docs to require the hosted CI
   verification path.
 

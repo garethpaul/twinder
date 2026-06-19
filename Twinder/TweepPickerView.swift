@@ -15,6 +15,12 @@ import TwitterKit
 class TweepPickerView : MDCSwipeToChooseView {
     var tweep: Tweep?
     var infoView: UIView = UIView()
+    private var imageTask: NSURLSessionDataTask?
+    private var imageRequestGeneration = 0
+
+    deinit {
+        imageTask?.cancel()
+    }
 
     required init(coder: NSCoder) {
         super.init(coder: coder)
@@ -66,13 +72,27 @@ class TweepPickerView : MDCSwipeToChooseView {
     }
 
     func loadImageView() {
+        imageTask?.cancel()
+        imageTask = nil
+        imageRequestGeneration += 1
+        let requestGeneration = imageRequestGeneration
+        self.imageView.image = nil
         if let selectedTweep = self.tweep {
             let pic = Picture()
             let urlString = selectedTweep.image
             if let imageURL = NSURL(string: urlString) {
-                pic.get(imageURL, {image, error in
-                    if let loadedImage = image {
-                        self.imageView.image = loadedImage
+                imageTask = pic.get(imageURL, {[weak self] image, error in
+                    if let strongSelf = self {
+                        if strongSelf.imageRequestGeneration == requestGeneration {
+                            strongSelf.imageTask = nil
+                            if let currentTweep = strongSelf.tweep {
+                                if currentTweep.image == urlString {
+                                    if let loadedImage = image {
+                                        strongSelf.imageView.image = loadedImage
+                                    }
+                                }
+                            }
+                        }
                     }
                 })
             }

@@ -34,10 +34,27 @@ Helpful reports include:
 - Dependency manifests detected: Podfile, Podfile.lock. Dependency updates should preserve lockfiles when present and avoid introducing packages without a clear maintenance reason.
 - GitHub Actions runs `make check` for pushes and pull requests so the static
   Xcode, CocoaPods lock, Twitter API, and Core Data guardrails stay enforced
-  before merge.
+  before merge. The workflow uses read-only permissions, credential-free
+  checkout, immutable action pins, a bounded runtime, and structural mutation
+  tests that reject contradictory credential settings, write permissions,
+  unreviewed actions, and weakened verification commands.
 - The shared profile image helper accepts only HTTPS URLs, uses bounded request
   duration and response size, validates successful image responses, and keeps
-  network work off the main operation queue.
+  network work in cancellable URLSession tasks off the main operation queue.
+- Reused saved-profile cells cancel obsolete image tasks and reject stale
+  completions.
+- Reused saved-profile cells remove owned overlays before reconfiguration.
+- Saved-profile selection validates table identity before opening Twitter.
+- Saved-profile writes persist before publishing success. A missing Core Data
+  context or failed save must not update the in-memory saved-profile list.
+  Writes use an isolated context and rollback, and optional persisted fields
+  are guarded before use.
+- Swipe-card image completions weakly capture the card and verify that its
+  current profile URL and request generation still match before updating UI
+  state; replacement loads and card release cancel the active task.
+- Twitter profile routes build the screen name as a URL query item and open
+  only a successfully constructed URL that iOS reports as supported after the
+  handle passes the ASCII Twitter alphabet and length checks.
 
 ## Mobile Privacy Notes
 

@@ -8,6 +8,15 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 
+from workflow_contract import validate as validate_workflow
+from saved_profile_selection_contract import validation_errors as selection_validation_errors
+from saved_profile_cell_contract import validation_errors as cell_validation_errors
+from saved_profile_model_contract import validation_errors as model_validation_errors
+from saved_profile_write_contract import validation_errors as write_validation_errors
+from deep_link_contract import validation_errors as deep_link_validation_errors
+from legacy_build_contract import validation_errors as build_validation_errors
+from project_path_contract import validation_errors as project_path_validation_errors
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS_PLANS = ROOT / "docs/plans"
@@ -20,6 +29,15 @@ FRIENDS_LIST_DATA_PLAN = DOCS_PLANS / "2026-06-09-friends-list-data-guard.md"
 CI_PLAN = DOCS_PLANS / "2026-06-10-ci-baseline.md"
 PROFILE_IMAGE_TRANSPORT_PLAN = DOCS_PLANS / "2026-06-10-profile-image-transport.md"
 TABLE_IMAGE_REUSE_PLAN = DOCS_PLANS / "2026-06-10-table-image-reuse.md"
+SAVED_PROFILE_CONTEXT_PLAN = DOCS_PLANS / "2026-06-12-saved-profile-context-guard.md"
+SWIPE_CARD_IMAGE_IDENTITY_PLAN = DOCS_PLANS / "2026-06-13-swipe-card-image-identity.md"
+SWIPE_CARD_IMAGE_CANCELLATION_PLAN = DOCS_PLANS / "2026-06-13-swipe-card-image-cancellation.md"
+SAFE_TWITTER_DEEP_LINK_PLAN = DOCS_PLANS / "2026-06-13-safe-twitter-deep-link.md"
+MAKE_ROOT_PROTECTION_PLAN = DOCS_PLANS / "2026-06-14-make-root-override-protection.md"
+LEGACY_SETUP_NOTES_PLAN = DOCS_PLANS / "2026-06-14-legacy-setup-notes.md"
+SAVED_PROFILE_IMAGE_CANCELLATION_PLAN = DOCS_PLANS / "2026-06-16-saved-profile-image-cancellation.md"
+SAFE_SAVED_PROFILE_SELECTION_PLAN = DOCS_PLANS / "2026-06-16-safe-saved-profile-selection.md"
+SAVED_PROFILE_WRITE_PLAN = DOCS_PLANS / "2026-06-17-saved-profile-write-transaction.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -43,6 +61,10 @@ def load_plist(relative_path):
 
 
 def check_project_files_parse():
+    gitignore = read_text(".gitignore")
+    require("__pycache__/" in gitignore, "Python bytecode cache directories must be ignored")
+    require("*.py[cod]" in gitignore, "Python bytecode files must be ignored")
+
     app_info = load_plist("Twinder/Info.plist")
     test_info = load_plist("TwinderTests/Info.plist")
     require(app_info["UIMainStoryboardFile"] == "Main", "app must launch Main.storyboard")
@@ -66,6 +88,52 @@ def check_pod_lock_integrity():
     project = read_text("Twinder.xcodeproj/project.pbxproj")
     require("TwinderTests.swift in Sources" in project, "test source must remain in the Xcode project")
     require("Pods-Twinder.debug.xcconfig" in project, "CocoaPods debug xcconfig must remain referenced")
+
+
+def check_legacy_setup_metadata():
+    project = read_text("Twinder.xcodeproj/project.pbxproj")
+    podfile_lock = read_text("Podfile.lock")
+    twitterkit_info = load_plist("TwitterKit.framework/Versions/A/Resources/Info.plist")
+    fabric_info = load_plist("Fabric.framework/Versions/A/Resources/Info.plist")
+
+    require('compatibilityVersion = "Xcode 3.2";' in project, "project must retain its Xcode 3.2 format")
+    require(
+        project.count("IPHONEOS_DEPLOYMENT_TARGET = 8.0;") == 2,
+        "project must retain both iOS 8.0 deployment targets",
+    )
+    require(
+        project.count("IPHONEOS_DEPLOYMENT_TARGET = 8.2;") == 2,
+        "project must retain both iOS 8.2 deployment targets",
+    )
+    require("MDCSwipeToChoose (0.2.1)" in podfile_lock, "Pod lock must pin MDCSwipeToChoose 0.2.1")
+    require("COCOAPODS: 0.35.0" in podfile_lock, "Pod lock must record CocoaPods 0.35.0")
+    require(
+        twitterkit_info["CFBundleShortVersionString"] == "1.2.0",
+        "vendored TwitterKit must remain version 1.2.0",
+    )
+    require(
+        fabric_info["CFBundleShortVersionString"] == "1.1.1",
+        "vendored Fabric must remain version 1.1.1",
+    )
+
+    documentation = {
+        "README.md": [
+            "Legacy Toolchain Boundary",
+            "CocoaPods 0.35.0",
+            "MDCSwipeToChoose 0.2.1",
+            "TwitterKit 1.2.0",
+            "Fabric 1.1.1",
+            "pre-modern language dialect",
+            "service dependencies are retired",
+            "docs/plans/2026-06-14-legacy-setup-notes.md",
+        ],
+        "VISION.md": ["Keep historical Xcode, CocoaPods, TwitterKit, Fabric"],
+        "CHANGES.md": ["CocoaPods 0.35.0", "retired-service compatibility boundary"],
+    }
+    for relative_path, phrases in documentation.items():
+        text = read_text(relative_path)
+        for phrase in phrases:
+            require(phrase in text, f"{relative_path} must document {phrase}")
 
 
 def check_tweep_picture_json_guard():
@@ -176,8 +244,8 @@ def check_profile_image_loading_guards():
         "ViewController must guard decoded profile images before assignment",
     )
     require(
-        "func get(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void))" in picture,
-        "Picture.get must expose optional decoded images",
+        "func get(url: NSURL, handler: ((image: UIImage?, NSError!) -> Void)) -> NSURLSessionDataTask?" in picture,
+        "Picture.get must expose optional decoded images and return a cancellable task",
     )
     require(
         "UIImage(data: data)!" not in picture,
@@ -192,7 +260,9 @@ def check_profile_image_loading_guards():
         "maximumImageBytes = 5 * 1024 * 1024": "bound profile image responses to 5 MiB",
         "cachePolicy: .ReturnCacheDataElseLoad": "use the response cache when possible",
         "timeoutInterval: 15": "bound profile image request duration",
-        "queue: NSOperationQueue()": "download profile images off the main queue",
+        "NSURLSession.sharedSession().dataTaskWithRequest(imageRequest": "download profile images with URLSession",
+        "imageTask.resume()": "start the profile image task explicitly",
+        "return imageTask": "return the cancellable profile image task",
         "if let httpResponse = response as? NSHTTPURLResponse": "validate HTTP responses",
         "httpResponse.statusCode >= 200 && httpResponse.statusCode < 300": "reject non-success HTTP responses",
         'mimeType?.hasPrefix("image/") == true': "reject non-image response bodies",
@@ -202,10 +272,7 @@ def check_profile_image_loading_guards():
     }
     for fragment, behavior in transport_contracts.items():
         require(fragment in picture, f"Picture.get must {behavior}")
-    require(
-        "queue: NSOperationQueue.mainQueue()" not in picture,
-        "Picture.get must not perform profile image downloads on the main queue",
-    )
+    require("NSURLConnection" not in picture, "Picture.get must not retain the legacy connection API")
     require("httpResponse!" not in picture, "Picture.get must not force-unwrap HTTP responses")
 
 
@@ -244,24 +311,173 @@ def check_person_profile_image_guards():
 
 def check_table_profile_image_reuse_guards():
     source = read_text("Twinder/TableController.swift")
+    cell_source = read_text("Twinder/TweepCell.swift")
 
     for contract in (
-        "cell.peepImage.image = nil",
-        "if let imageURL = NSURL(string: fav_tweep.image_url)",
+        "let imageRequestGeneration = cell.beginImageLoad()",
+        "if let imageURLString = fav_tweep.image_url",
+        "if let imageURL = NSURL(string: imageURLString)",
+        "let imageTask = pic.get(imageURL, {[weak cell] newImage, error in",
+        "if let strongCell = cell",
+        "if strongCell.finishImageLoad(imageRequestGeneration)",
         "if let img = newImage",
-        "if let currentIndexPath = tableView.indexPathForCell(cell)",
+        "if let currentIndexPath = tableView.indexPathForCell(strongCell)",
         "if currentIndexPath.isEqual(indexPath)",
+        "cell.ownImageTask(imageTask, generation: imageRequestGeneration)",
     ):
         require(contract in source, f"saved-profile table image guard is missing: {contract}")
 
+    for contract in (
+        "private var imageTask: NSURLSessionDataTask?",
+        "private var imageRequestGeneration = 0",
+        "override func prepareForReuse()",
+        "super.prepareForReuse()",
+        "func beginImageLoad() -> Int",
+        "func ownImageTask(task: NSURLSessionDataTask?, generation: Int)",
+        "func finishImageLoad(generation: Int) -> Bool",
+        "if imageRequestGeneration == generation",
+        "task?.cancel()",
+    ):
+        require(contract in cell_source, f"saved-profile cell image lifecycle is missing: {contract}")
     require(
-        "NSURL(string: fav_tweep.image_url)!" not in source,
+        cell_source.count("imageTask?.cancel()") >= 3,
+        "saved-profile cells must cancel image tasks on replacement, reuse, and release",
+    )
+    require(
+        cell_source.count("imageRequestGeneration += 1") >= 2,
+        "saved-profile cells must invalidate generations on replacement and reuse",
+    )
+    load_contracts = (
+        "let imageRequestGeneration = cell.beginImageLoad()",
+        "let imageTask = pic.get(imageURL, {[weak cell] newImage, error in",
+        "if strongCell.finishImageLoad(imageRequestGeneration)",
+        "if let currentIndexPath = tableView.indexPathForCell(strongCell)",
+        "if currentIndexPath.isEqual(indexPath)",
+        "strongCell.peepImage.image = img",
+        "cell.ownImageTask(imageTask, generation: imageRequestGeneration)",
+    )
+    positions = [source.index(contract) for contract in load_contracts]
+    require(
+        positions == sorted(positions),
+        "saved-profile task ownership, generation, identity, assignment, and adoption guards must stay ordered",
+    )
+
+    require(
+        "fav_tweep.image_url!" not in source,
         "saved-profile table must not force-unwrap profile image URLs",
     )
     require(
         "let img: UIImage = NewImage" not in source,
         "saved-profile table must not assign optional decoded image data directly",
     )
+
+
+def check_swipe_card_image_identity_guard():
+    source = read_text("Twinder/TweepPickerView.swift")
+    contracts = (
+        "private var imageTask: NSURLSessionDataTask?",
+        "private var imageRequestGeneration = 0",
+        "deinit {",
+        "imageTask?.cancel()",
+        "imageRequestGeneration += 1",
+        "let requestGeneration = imageRequestGeneration",
+        "self.imageView.image = nil",
+        "imageTask = pic.get(imageURL, {[weak self] image, error in",
+        "if let strongSelf = self",
+        "if strongSelf.imageRequestGeneration == requestGeneration",
+        "strongSelf.imageTask = nil",
+        "if let currentTweep = strongSelf.tweep",
+        "if currentTweep.image == urlString",
+        "if let loadedImage = image",
+        "strongSelf.imageView.image = loadedImage",
+    )
+    for contract in contracts:
+        require(contract in source, f"swipe-card image identity guard is missing: {contract}")
+
+    ordered_contracts = (
+        "self.imageView.image = nil",
+        "imageTask = pic.get(imageURL, {[weak self] image, error in",
+        "if let strongSelf = self",
+        "if strongSelf.imageRequestGeneration == requestGeneration",
+        "strongSelf.imageTask = nil",
+        "if let currentTweep = strongSelf.tweep",
+        "if currentTweep.image == urlString",
+        "if let loadedImage = image",
+        "strongSelf.imageView.image = loadedImage",
+    )
+    positions = [source.index(contract) for contract in ordered_contracts]
+    require(
+        positions == sorted(positions),
+        "swipe-card image reset, weak capture, identity, decode, and assignment guards must stay ordered",
+    )
+    require(
+        "self.imageView.image = loadedImage" not in source,
+        "swipe-card image completion must not strongly capture the card",
+    )
+    require(
+        source.count("imageTask?.cancel()") >= 2,
+        "swipe-card image tasks must be cancelled on replacement and deinitialization",
+    )
+    load_source = source[source.index("func loadImageView()") : source.index("func constructNameLabel()")]
+    lifecycle_contracts = (
+        "imageTask?.cancel()",
+        "imageTask = nil",
+        "imageRequestGeneration += 1",
+        "let requestGeneration = imageRequestGeneration",
+        "self.imageView.image = nil",
+        "imageTask = pic.get(imageURL, {[weak self] image, error in",
+        "if strongSelf.imageRequestGeneration == requestGeneration",
+        "strongSelf.imageTask = nil",
+        "if currentTweep.image == urlString",
+        "strongSelf.imageView.image = loadedImage",
+    )
+    lifecycle_positions = [load_source.index(contract) for contract in lifecycle_contracts]
+    require(
+        lifecycle_positions == sorted(lifecycle_positions),
+        "swipe-card cancellation, generation, identity, and assignment guards must stay ordered",
+    )
+
+
+def check_saved_profile_context_guard():
+    source = read_text("Twinder/TableController.swift")
+
+    require(
+        "managedObjectContext!.executeFetchRequest" not in source,
+        "saved-profile fetch must not force-unwrap the managed object context",
+    )
+    require(
+        "if let context = managedObjectContext" in source,
+        "saved-profile fetch must guard the managed object context",
+    )
+    require(
+        "context.executeFetchRequest(fetchRequest, error: nil)" in source,
+        "saved-profile fetch must execute through the guarded context",
+    )
+
+
+def check_saved_profile_selection_guard():
+    source = read_text("Twinder/TableController.swift")
+    errors = selection_validation_errors(source)
+    require(not errors, errors[0] if errors else "")
+
+
+def check_saved_profile_cell_lifecycle():
+    source = read_text("Twinder/TableController.swift")
+    errors = cell_validation_errors(source)
+    require(not errors, errors[0] if errors else "")
+
+
+def check_saved_profile_model_boundary():
+    model_source = read_text("Twinder/FavTweets.swift")
+    table_source = read_text("Twinder/TableController.swift")
+    errors = model_validation_errors(model_source, table_source)
+    require(not errors, errors[0] if errors else "")
+
+
+def check_saved_profile_write_guard():
+    source = read_text("Twinder/TweepPickerViewController.swift")
+    errors = write_validation_errors(source)
+    require(not errors, errors[0] if errors else "")
 
 
 def check_swipe_card_remote_data_guards():
@@ -381,6 +597,46 @@ def check_login_session_guard():
     )
 
 
+def check_twitter_deep_link_guard():
+    source = read_text("Twinder/DeepLinks.swift")
+
+    errors = deep_link_validation_errors(source)
+    require(not errors, errors[0] if errors else "")
+
+    contracts = {
+        "let components = NSURLComponents()": "build Twitter deep links with URL components",
+        'components.scheme = "twitter"': "keep the fixed Twitter URL scheme",
+        'components.host = "user"': "keep the fixed Twitter user route",
+        'NSURLQueryItem(name: "screen_name", value: screen_name)': "encode the screen name as one query item",
+        "if let url = components.URL": "fail closed when URL construction fails",
+        "UIApplication.sharedApplication().canOpenURL(url)": "check app routing before opening",
+        "UIApplication.sharedApplication().openURL(url)": "open the validated bound URL",
+    }
+    for fragment, behavior in contracts.items():
+        require(fragment in source, f"DeepLinks must {behavior}")
+
+    require(
+        '"twitter://user?screen_name=" + screen_name' not in source,
+        "DeepLinks must not concatenate screen names into URL syntax",
+    )
+    require("url!" not in source, "DeepLinks must not force-unwrap constructed URLs")
+    require(
+        source.index("if let url = components.URL")
+        < source.index("UIApplication.sharedApplication().canOpenURL(url)")
+        < source.index("UIApplication.sharedApplication().openURL(url)"),
+        "DeepLinks must construct, validate, and open the same URL in order",
+    )
+
+    documentation = {
+        "README.md": "Twitter profile deep links encode the screen name as a query item",
+        "SECURITY.md": "Twitter profile routes build the screen name as a URL query item",
+        "VISION.md": "Encode Twitter profile deep-link query values",
+        "CHANGES.md": "Built Twitter profile deep links from fixed URL components",
+    }
+    for relative_path, phrase in documentation.items():
+        require(phrase in read_text(relative_path), f"{relative_path} must document safe Twitter deep links")
+
+
 def check_docs_plans():
     require(DOCS_PLANS.is_dir(), "docs/plans must exist")
     plans = sorted(DOCS_PLANS.glob("*.md"))
@@ -397,6 +653,69 @@ def check_docs_plans():
         f"{PROFILE_IMAGE_TRANSPORT_PLAN.relative_to(ROOT)} must be present",
     )
     require(TABLE_IMAGE_REUSE_PLAN in plans, f"{TABLE_IMAGE_REUSE_PLAN.relative_to(ROOT)} must be present")
+    require(
+        SAVED_PROFILE_CONTEXT_PLAN in plans,
+        f"{SAVED_PROFILE_CONTEXT_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(
+        SWIPE_CARD_IMAGE_IDENTITY_PLAN in plans,
+        f"{SWIPE_CARD_IMAGE_IDENTITY_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(
+        SWIPE_CARD_IMAGE_CANCELLATION_PLAN in plans,
+        f"{SWIPE_CARD_IMAGE_CANCELLATION_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(
+        SAFE_TWITTER_DEEP_LINK_PLAN in plans,
+        f"{SAFE_TWITTER_DEEP_LINK_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(
+        MAKE_ROOT_PROTECTION_PLAN in plans,
+        f"{MAKE_ROOT_PROTECTION_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(
+        LEGACY_SETUP_NOTES_PLAN in plans,
+        f"{LEGACY_SETUP_NOTES_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(
+        SAVED_PROFILE_IMAGE_CANCELLATION_PLAN in plans,
+        f"{SAVED_PROFILE_IMAGE_CANCELLATION_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(
+        SAFE_SAVED_PROFILE_SELECTION_PLAN in plans,
+        f"{SAFE_SAVED_PROFILE_SELECTION_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(
+        SAVED_PROFILE_WRITE_PLAN in plans,
+        f"{SAVED_PROFILE_WRITE_PLAN.relative_to(ROOT)} must be present",
+    )
+
+    cancellation_plan = SAVED_PROFILE_IMAGE_CANCELLATION_PLAN.read_text(encoding="utf-8")
+    for evidence in (
+        "Status: Completed",
+        "repository and external-directory `make check` passed",
+        "hostile saved-profile image mutations were rejected",
+        "generated-artifact and credential-pattern audits passed",
+    ):
+        require(evidence in cancellation_plan, f"saved-profile cancellation plan must record {evidence}")
+
+    selection_plan = SAFE_SAVED_PROFILE_SELECTION_PLAN.read_text(encoding="utf-8")
+    for evidence in (
+        "Status: Completed",
+        "repository and external-directory `make check` passed",
+        "hostile saved-profile selection mutations were rejected",
+        "generated-artifact and credential-pattern audits passed",
+    ):
+        require(evidence in selection_plan, f"saved-profile selection plan must record {evidence}")
+
+    write_plan = SAVED_PROFILE_WRITE_PLAN.read_text(encoding="utf-8")
+    for evidence in (
+        "Status: Completed",
+        "repository and external-directory `make check` passed",
+        "hostile saved-profile write mutations were rejected",
+        "generated-artifact and credential-pattern audits passed",
+    ):
+        require(evidence in write_plan, f"saved-profile write plan must record {evidence}")
 
     for plan in plans:
         text = plan.read_text(encoding="utf-8")
@@ -407,27 +726,23 @@ def check_docs_plans():
 def check_ci_baseline_docs():
     require(CI_WORKFLOW.exists(), ".github/workflows/check.yml is missing")
     workflow = CI_WORKFLOW.read_text(encoding="utf-8")
-    require("permissions:\n  contents: read" in workflow, "CI workflow must keep contents read-only")
-    require("timeout-minutes: 10" in workflow, "CI workflow must have a bounded runtime")
-    require("runs-on: ubuntu-24.04" in workflow, "CI workflow must use a fixed Ubuntu runner")
-    require("concurrency:" in workflow, "CI workflow must cancel superseded runs")
-    require("cancel-in-progress: true" in workflow, "CI workflow must cancel superseded runs")
-    require('python-version: ["3.10", "3.12", "3.14"]' in workflow, "CI workflow must cover supported Python versions")
-    require("actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" in workflow, "CI workflow must pin checkout")
-    require("actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405" in workflow, "CI workflow must pin Python setup")
-    require("workflow_dispatch:" in workflow, "CI workflow must support manual verification")
-    require("run: make check" in workflow, "CI workflow must run make check")
-    require("@v" not in workflow, "CI workflow actions must use immutable commits")
-    require("ubuntu-latest" not in workflow, "CI workflow must not use a floating Ubuntu runner")
-    require("# v6.0.3" in workflow, "checkout pin annotation must identify the exact release")
-    require("# v6.2.0" in workflow, "setup-python pin annotation must identify the exact release")
+    errors = validate_workflow(workflow)
+    require(not errors, f"CI workflow must {errors[0]}" if errors else "")
 
     makefile = read_text("Makefile")
+    build_errors = build_validation_errors(makefile)
+    require(not build_errors, build_errors[0] if build_errors else "")
+    project_source = read_text("Twinder.xcodeproj/project.pbxproj")
+    project_errors = project_path_validation_errors(project_source)
+    require(not project_errors, project_errors[0] if project_errors else "")
+    makefile_lines = set(makefile.splitlines())
     require(
-        "ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile,
-        "Makefile must resolve commands from the repository root",
+        "override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile_lines,
+        "Makefile must protect commands rooted at the repository",
     )
+    require("PYTHON ?= python3" in makefile_lines, "Makefile must preserve the Python command override")
     require('"$(ROOT)/scripts/check_ios_contracts.py"' in makefile, "Makefile must use the rooted checker path")
+    require('"$(ROOT)/scripts/test_workflow_contract.py"' in makefile, "Makefile must run workflow contract mutations")
     require('cd "$(ROOT)" && xcodebuild' in makefile, "Makefile must run xcodebuild from the repository root")
 
     docs = {
@@ -442,21 +757,44 @@ def check_ci_baseline_docs():
         for phrase in required_phrases:
             require(phrase in text, f"{relative_path} must document {phrase}")
 
+    for relative_path in ("AGENTS.md", "README.md", "VISION.md", "SECURITY.md", "CHANGES.md"):
+        text = " ".join(read_text(relative_path).split())
+        require(
+            "Reused saved-profile cells cancel obsolete image tasks and reject stale completions." in text,
+            f"{relative_path} must document saved-profile image cancellation",
+        )
+        require(
+            "Saved-profile selection validates table identity before opening Twitter." in text,
+            f"{relative_path} must document saved-profile selection validation",
+        )
+        require(
+            "Saved-profile writes persist before publishing success." in text,
+            f"{relative_path} must document saved-profile write transactions",
+        )
+
 
 def main():
     checks = [
         check_project_files_parse,
         check_pod_lock_integrity,
+        check_legacy_setup_metadata,
         check_tweep_picture_json_guard,
         check_tweep_picture_failure_completion,
         check_api_json_guards,
         check_profile_image_loading_guards,
         check_person_profile_image_guards,
         check_table_profile_image_reuse_guards,
+        check_swipe_card_image_identity_guard,
+        check_saved_profile_context_guard,
+        check_saved_profile_selection_guard,
+        check_saved_profile_cell_lifecycle,
+        check_saved_profile_model_boundary,
+        check_saved_profile_write_guard,
         check_swipe_card_remote_data_guards,
         check_initial_card_data_guards,
         check_core_data_failure_guards,
         check_login_session_guard,
+        check_twitter_deep_link_guard,
         check_docs_plans,
         check_ci_baseline_docs,
     ]

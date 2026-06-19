@@ -34,8 +34,24 @@ Additional scan context:
 ### Prerequisites
 
 - Git
-- macOS with Xcode for building Apple platform projects
-- CocoaPods if dependencies need to be installed
+- macOS with a historical Xcode/Swift toolchain for any native build attempt
+- CocoaPods 0.35.0 if the locked dependencies must be reproduced
+
+### Legacy Toolchain Boundary
+
+- The Xcode project uses the Xcode 3.2-compatible project format and records
+  iOS deployment targets 8.0 and 8.2.
+- `Podfile.lock` pins CocoaPods 0.35.0 and MDCSwipeToChoose 0.2.1.
+- The repository vendors TwitterKit 1.2.0 and Fabric 1.1.1 frameworks.
+- The Swift source uses a pre-modern language dialect. Current Xcode may require
+  a dedicated migration before it can compile the project.
+- TwitterKit, Fabric, and their service dependencies are retired. A native
+  build does not prove that login, API, deep-link, or timeline behavior still
+  works against current services.
+
+The checked-in Xcode project, `Podfile.lock`, and framework metadata are the
+sources of truth for this historical boundary. Do not add credentials while
+attempting reproduction.
 
 ### Setup
 
@@ -51,7 +67,10 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
 
 - Open `Twinder.xcodeproj` in Xcode, choose the app or sample scheme, and run it on the matching simulator/device.
 - Run `make check` for static project and Twitter API parsing checks. The build
-  step runs Xcode only on hosts where `xcodebuild` is installed.
+  step runs the native build only with the compatible Xcode 6 toolchain; modern
+  Xcode releases report the documented legacy skip instead of attempting an
+  unsupported Swift migration. The checked-in bridge header path is relative
+  to the repository rather than an individual developer home directory.
 
 ## Testing and Verification
 
@@ -59,17 +78,37 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   parsing, profile-image loading, current-user profile image loading,
   current-user profile image failure completion, swipe-card remote-data,
   timeline tweet completion, initial swipe-card data, friends-list session,
-  friends-list response data, login session, and Core Data failure-path
-  contract checks.
-- Shared profile image downloads require HTTPS, run off the main queue, time
+  friends-list response data, login session, saved-profile context,
+  saved-profile write transactions, and Core Data failure-path contract checks.
+- Shared profile image downloads require HTTPS, run through cancellable
+  URLSession tasks off the main queue, time
   out after 15 seconds, and reject non-success, non-image, oversized, or
   undecodable responses before returning to UI code on the main queue.
 - Saved-profile rows clear reused images and verify that asynchronous image
   results still belong to the row before updating the cell.
+- Reused saved-profile cells cancel obsolete image tasks and reject stale
+  completions.
+- Reused saved-profile cells remove their owned name and border overlays before
+  reconfiguration instead of accumulating duplicate subviews.
+- Saved-profile selection validates table identity before opening Twitter.
+- Saved-profile writes persist before publishing success. Missing Core Data
+  contexts and failed saves leave both durable and in-memory favorites
+  unchanged. Each insertion uses an isolated context and rollback, while
+  optional legacy fields are bound before table use.
+- Swipe cards clear old profile images, weakly capture the card during image
+  loading, and verify the requested URL still belongs to the current profile
+  before applying a late completion. Replacement loads and released cards
+  cancel their active task, and request generations reject older same-URL
+  completions.
+- Twitter profile deep links encode the screen name as a query item, avoid URL
+  force unwraps, reject handles outside the 1-15 character ASCII Twitter
+  alphabet, and open only when iOS accepts the constructed route.
 - Completed maintenance plans live under `docs/plans` and are checked by
   `make check`.
 - GitHub Actions runs the same static contracts on Python 3.10, 3.12, and 3.14
-  on Ubuntu 24.04 with read-only permissions and immutable action pins.
+  on Ubuntu 24.04 with read-only permissions, credential-free checkout, and
+  immutable action pins. Dependency-free mutation tests reject contradictory
+  or relocated credential settings and other workflow policy regressions.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
@@ -122,6 +161,16 @@ When the required SDK or runtime is unavailable, use static checks and source re
   profile image transport hardening.
 - See `docs/plans/2026-06-10-table-image-reuse.md` for saved-profile table
   image reuse guard coverage.
+- See `docs/plans/2026-06-12-saved-profile-context-guard.md` for the guarded
+  saved-profile Core Data fetch fallback.
+- See `docs/plans/2026-06-13-swipe-card-image-identity.md` for weak and
+  identity-checked swipe-card image completions.
+- See `docs/plans/2026-06-13-swipe-card-image-cancellation.md` for cancellable
+  swipe-card image tasks and same-URL generation guards.
+- See `docs/plans/2026-06-13-safe-twitter-deep-link.md` for encoded,
+  fail-closed Twitter profile routing.
+- See `docs/plans/2026-06-14-legacy-setup-notes.md` for the historical Xcode,
+  CocoaPods, TwitterKit, Fabric, and Swift compatibility boundary.
 
 ## Contributing
 
