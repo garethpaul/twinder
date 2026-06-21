@@ -3,10 +3,10 @@
 
 def validation_errors(source):
     contracts = (
-        "if command -v xcodebuild",
-        "xcode_major=$$(xcodebuild -version",
-        'if [ "$$xcode_major" -le 6 ]',
-        'cd "$$ROOT" && xcodebuild',
+        "if [ -x '/usr/bin/xcodebuild' ]",
+        "xcode_major=$$$$('/usr/bin/xcodebuild' -version",
+        'if [ "$$$$xcode_major" -le 6 ]',
+        "cd '$(REPOSITORY_ROOT_LITERAL)' && '/usr/bin/xcodebuild'",
         "requires Xcode 6.x for its pre-versioned Swift sources",
         "xcodebuild is not available on this host",
     )

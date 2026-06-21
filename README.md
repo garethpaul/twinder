@@ -71,8 +71,17 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   Xcode releases report the documented legacy skip instead of attempting an
   unsupported Swift migration. The checked-in bridge header path is relative
   to the repository rather than an individual developer home directory.
-- Run `make root-test` to verify Make startup, shell, Python, root, and
-  execution-mode authority with adversarial external-directory cases.
+- Run `make root-test` to verify the local Make boundary from external and
+  hostile paths. Public aliases reject later recipe replacement and embed the
+  reviewed repository root and Python command before later non-override target
+  variables can redirect them. They also pin `/bin/sh -c` against later
+  non-override shell assignments and use `/usr/bin/xcodebuild` directly.
+  Caller-supplied Make programs using GNU Make `override` directives remain
+  outside the local trust boundary. GNU Make startup files are parsed before
+  repository checks, so startup code is also outside the local trust boundary.
+  absolute Python executable selection defaults to `/usr/bin/python3`, is baked
+  into recipes, and runs with isolated Python startup (`-I -B`) so `PATH`,
+  `PYTHONPATH`, user-site packages, and `sitecustomize.py` cannot replace checks.
 
 ## Testing and Verification
 
@@ -173,8 +182,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   fail-closed Twitter profile routing.
 - See `docs/plans/2026-06-14-legacy-setup-notes.md` for the historical Xcode,
   CocoaPods, TwitterKit, Fabric, and Swift compatibility boundary.
-- See `docs/plans/2026-06-21-make-authority-isolation.md` for the complete Make
-  startup, shell, Python, and execution-mode authority boundary.
+- See `docs/plans/2026-06-21-make-authority-isolation.md` for the narrowed local
+  Make authority boundary and its caller-program exclusions.
 
 ## Contributing
 

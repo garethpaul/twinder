@@ -740,13 +740,16 @@ def check_ci_baseline_docs():
         any(line.startswith("override ROOT := $(shell path=") for line in makefile_lines),
         "Makefile must protect commands rooted at the repository",
     )
-    require("PYTHON ?= python3" in makefile_lines, "Makefile must preserve the Python command override")
-    require("override PYTHON := $(value PYTHON)" in makefile_lines, "Makefile must freeze the Python override")
+    require("override PYTHON := /usr/bin/python3" in makefile_lines, "Makefile must use the fixed default Python interpreter")
     for authority_contract in (
         ".DEFAULT_GOAL := check",
         ".PHONY: __repository-make-authority build check contract-test lint root-test test verify",
         "override SHELL := /bin/sh",
         "override .SHELLFLAGS := -c",
+        "build check contract-test lint root-test test verify __repository-make-authority: override SHELL := /bin/sh",
+        "build check contract-test lint root-test test verify __repository-make-authority: override .SHELLFLAGS := -c",
+        "override REPOSITORY_ROOT_LITERAL :=",
+        "override REPOSITORY_PYTHON_LITERAL :=",
         "PYTHON must be a literal executable path, not Make syntax",
         "MAKEFLAGS must not be overridden for repository verification",
         "non-executing or error-ignoring MAKEFLAGS are not supported",
@@ -755,10 +758,25 @@ def check_ci_baseline_docs():
         "repository Makefile must be loaded alone",
     ):
         require(authority_contract in makefile, f"Makefile must preserve authority contract: {authority_contract}")
-    require('"$$ROOT/scripts/check_ios_contracts.py"' in makefile, "Makefile must use the rooted checker path")
-    require('"$$ROOT/scripts/test_workflow_contract.py"' in makefile, "Makefile must run workflow contract mutations")
-    require('"$$ROOT/scripts/test-makefile-root.sh"' in makefile, "Makefile must run authority regressions")
-    require('cd "$$ROOT" && xcodebuild' in makefile, "Makefile must run xcodebuild from the repository root")
+    require("lint::" in makefile, "Makefile public recipes must use double-colon rules")
+    require("REPOSITORY_PYTHON='$(REPOSITORY_PYTHON_LITERAL)' '$(REPOSITORY_ROOT_LITERAL)/scripts/run-python.sh'" in makefile, "Makefile must embed the rooted checker command")
+    require("scripts/test_workflow_contract.py" in makefile, "Makefile must embed workflow contract commands")
+    require("-I -B" in read_text("scripts/run-python.sh"), "Python launcher must isolate startup state")
+    require("/bin/sh '$(REPOSITORY_ROOT_LITERAL)/scripts/test-makefile-root.sh'" in makefile, "Makefile must embed the authority regression path")
+    require("/usr/bin/xcodebuild" in makefile, "Makefile must use the absolute system Xcode launcher")
+
+    boundary_docs = "\n".join(
+        read_text(path)
+        for path in ("README.md", "CHANGES.md", "docs/plans/2026-06-21-make-authority-isolation.md")
+    )
+    for boundary_phrase in (
+        "non-override",
+        "GNU Make `override` directives",
+        "isolated Python startup",
+        "startup files are parsed before repository checks",
+        "absolute Python executable selection",
+    ):
+        require(boundary_phrase in boundary_docs, f"Make authority documentation must state: {boundary_phrase}")
 
     docs = {
         "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md"],

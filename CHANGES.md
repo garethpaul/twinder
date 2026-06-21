@@ -7,6 +7,12 @@
   error-ignoring modes.
 - Added adversarial Make authority coverage and pinned hosted verification to
   `/usr/bin/make check` without changing the legacy iOS application.
+- Rejected later single-colon recipe replacement, embedded reviewed root and
+  Python command values before later non-override target assignments, pinned
+  the public recipe shell, and removed PATH control of `xcodebuild`.
+- Kept GNU Make startup parse code outside the enforceable boundary while
+  requiring absolute interpreters and isolating Python from `PYTHONPATH`,
+  user-site packages, and `sitecustomize.py`.
 
 ## 2026-06-19
 
