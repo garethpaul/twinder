@@ -15,17 +15,13 @@ def mutate(description, target, replacement):
     return mutated
 
 
-def assert_invalid(description, workflow):
-    if not validate(workflow):
-        raise AssertionError(f"{description} mutation was accepted")
-
-
 baseline_errors = validate(BASELINE)
 if baseline_errors:
     raise AssertionError(f"baseline workflow is invalid: {baseline_errors}")
 
 mutations = {
     "contradictory credentials": mutate("contradictory credentials", "persist-credentials: false", "persist-credentials: false\n          persist-credentials: true"),
+    "checkout ref override": mutate("checkout ref override", "persist-credentials: false", "persist-credentials: false\n          ref: master"),
     "relocated credentials": mutate("relocated credentials", "        with:\n          persist-credentials: false\n", "").replace("permissions:", "persist-credentials: false\n\npermissions:", 1),
     "floating checkout": mutate("floating checkout", CHECKOUT_ACTION, "actions/checkout@v6"),
     "floating setup": mutate("floating setup", SETUP_ACTION, "actions/setup-python@v6"),
@@ -60,6 +56,11 @@ mutations = {
         "  check:\n    runs-on:",
         "  check:\n    container: example/unreviewed:latest\n    runs-on:",
     ),
+    "service container": mutate(
+        "service container",
+        "  check:\n    runs-on:",
+        "  check:\n    services:\n      hostile:\n        image: example/unreviewed:latest\n    runs-on:",
+    ),
     "hostile job environment": mutate(
         "hostile job environment",
         "  check:\n    runs-on:",
@@ -70,12 +71,33 @@ mutations = {
         '        run: /usr/bin/make check PYTHON="$(command -v python)"',
         '        working-directory: /tmp\n        run: /usr/bin/make check PYTHON="$(command -v python)"',
     ),
+    "custom step shell": mutate(
+        "custom step shell",
+        '        run: /usr/bin/make check PYTHON="$(command -v python)"',
+        '        shell: /usr/bin/true {0}\n        run: /usr/bin/make check PYTHON="$(command -v python)"',
+    ),
+    "unnamed executable step": mutate(
+        "unnamed executable step",
+        "      - name: Run static contracts",
+        "      - run: ./ci-bypass.sh\n      - name: Run static contracts",
+    ),
+    "flow-style executable step": mutate(
+        "flow-style executable step",
+        "      - name: Run static contracts",
+        "      - { run: ./ci-bypass.sh }\n      - name: Run static contracts",
+    ),
+    "extra job": mutate(
+        "extra job",
+        "  check:\n    runs-on:",
+        "  hostile:\n    runs-on: ubuntu-24.04\n    steps:\n      - run: ./ci-bypass.sh\n  check:\n    runs-on:",
+    ),
     "wrong Python selector": mutate("wrong Python selector", "python-version: ${{ matrix.python-version }}", 'python-version: "3.12"'),
     "hosted Xcode": mutate("hosted Xcode", "run: /usr/bin/make check", "run: xcodebuild build && /usr/bin/make check"),
     "weakened gate": mutate("weakened gate", "run: /usr/bin/make check", "run: /usr/bin/make lint"),
 }
 
-for description, workflow in mutations.items():
-    assert_invalid(description, workflow)
+accepted_mutations = [description for description, workflow in mutations.items() if not validate(workflow)]
+if accepted_mutations:
+    raise AssertionError(f"mutations were accepted: {', '.join(accepted_mutations)}")
 
 print(f"workflow contract tests passed ({len(mutations)} mutations rejected).")
