@@ -13,6 +13,9 @@
 - Kept GNU Make startup parse code outside the enforceable boundary while
   requiring absolute interpreters and isolating Python from `PYTHONPATH`,
   user-site packages, and `sitecustomize.py`.
+- Rejected YAML-equivalent quoted write permissions and custom workflow shells
+  that could otherwise report required-check success without running the exact
+  reviewed `make check` command.
 
 ## 2026-06-19
 

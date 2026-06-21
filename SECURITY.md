@@ -36,8 +36,11 @@ Helpful reports include:
   Xcode, CocoaPods lock, Twitter API, and Core Data guardrails stay enforced
   before merge. The workflow uses read-only permissions, credential-free
   checkout, immutable action pins, a bounded runtime, and structural mutation
-  tests that reject contradictory credential settings, write permissions,
-  unreviewed actions, and weakened verification commands.
+  tests that reject contradictory credential settings, quoted or unquoted
+  write permissions, custom execution shells, unreviewed actions, and weakened
+  verification commands in the reviewed workflow shape. Coordinated changes to
+  both the workflow and its repository policy remain subject to code review and
+  provider-enforced required-check protection.
 - The shared profile image helper accepts only HTTPS URLs, uses bounded request
   duration and response size, validates successful image responses, and keeps
   network work in cancellable URLSession tasks off the main operation queue.

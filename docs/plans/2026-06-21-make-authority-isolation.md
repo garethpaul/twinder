@@ -30,6 +30,9 @@ controlled shell, startup-file, execution-mode, and Python expression state.
 - Executable regressions reject later single-colon recipe replacement, PATH
   shadowing, and hostile `sitecustomize.py`, while proving later non-override
   root, Python, and shell assignments cannot redirect checked-in commands.
+- Workflow regressions parse mapping keys and reject quoted write permissions,
+  custom shell/default/environment state, unreviewed steps, and any command
+  other than the exact reviewed `make check` invocation.
 
 ## Scope Boundary
 
@@ -40,6 +43,11 @@ that use GNU Make `override` directives likewise remain outside the local trust
 boundary because they are caller programs with Make-level authority. absolute
 Python executable selection is baked into recipes and uses isolated Python
 startup; explicit alternate interpreters remain caller authority.
+
+The workflow contract validates the checked-in workflow shape. It does not
+claim that repository code can authenticate itself against a coordinated
+caller change to both the workflow and the policy; that remains a code-review
+and provider-required-check boundary.
 
 Within that boundary, later non-override assignments cannot redirect the
 reviewed root, Python command, or recipe shell, later single-colon recipes fail

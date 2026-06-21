@@ -118,8 +118,10 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   `make check`.
 - GitHub Actions runs `/usr/bin/make check` on Python 3.10, 3.12, and 3.14
   on Ubuntu 24.04 with read-only permissions, credential-free checkout, and
-  immutable action pins. Dependency-free mutation tests reject contradictory
-  or relocated credential settings and other workflow policy regressions.
+  immutable action pins. Dependency-free semantic checks reject custom shell,
+  environment, step, command, and non-read-only permission changes to the
+  reviewed workflow shape. Coordinated replacement of both the workflow and
+  its repository policy remains a code-review and provider-protection boundary.
 - Xcode's test action or `xcodebuild test` with the appropriate scheme and destination on macOS
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
