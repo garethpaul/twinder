@@ -95,6 +95,26 @@ mutations = {
     "wrong Python selector": mutate("wrong Python selector", "python-version: ${{ matrix.python-version }}", 'python-version: "3.12"'),
     "hosted Xcode": mutate("hosted Xcode", "run: /usr/bin/make check", "run: xcodebuild build && /usr/bin/make check"),
     "weakened gate": mutate("weakened gate", "run: /usr/bin/make check", "run: /usr/bin/make lint"),
+    "folded gate": mutate(
+        "folded gate",
+        '        run: /usr/bin/make check PYTHON="$(command -v python)"',
+        '        run: >-\n          /usr/bin/make check PYTHON="$(command -v python)"',
+    ),
+    "literal gate": mutate(
+        "literal gate",
+        '        run: /usr/bin/make check PYTHON="$(command -v python)"',
+        '        run: |\n          /usr/bin/make check PYTHON="$(command -v python)"',
+    ),
+    "command comment": mutate(
+        "command comment",
+        '        run: /usr/bin/make check PYTHON="$(command -v python)"',
+        '        run: /usr/bin/make check PYTHON="$(command -v python)" # reviewed',
+    ),
+    "anchored command": mutate(
+        "anchored command",
+        '        run: /usr/bin/make check PYTHON="$(command -v python)"',
+        '        run: &gate /usr/bin/make check PYTHON="$(command -v python)"',
+    ),
 }
 
 accepted_mutations = [description for description, workflow in mutations.items() if not validate(workflow)]

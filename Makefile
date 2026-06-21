@@ -89,6 +89,7 @@ test:: lint
 
 contract-test::
 	REPOSITORY_PYTHON='$(REPOSITORY_PYTHON_LITERAL)' '$(REPOSITORY_ROOT_LITERAL)/scripts/run-python.sh' '$(REPOSITORY_ROOT_LITERAL)/scripts/test_workflow_contract.py'
+	REPOSITORY_PYTHON='$(REPOSITORY_PYTHON_LITERAL)' '$(REPOSITORY_ROOT_LITERAL)/scripts/run-python.sh' '$(REPOSITORY_ROOT_LITERAL)/scripts/test_trusted_workflow_contract.py'
 
 build::
 	@if [ -x '/usr/bin/xcodebuild' ]; then \
