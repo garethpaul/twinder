@@ -17,8 +17,10 @@ controlled shell, startup-file, execution-mode, and Python expression state.
 
 - Repository and external-directory `make check` passed all static and mutation
   contracts; the native build retained its documented Linux skip.
-- Authority tests cover 35 target/root/shell cases plus tool, startup, and mode
-  rejection.
+- Authority tests cover 35 target/root/shell cases, a literal hostile Python
+  path, command and environment Make-syntax rejection, command and environment
+  `MAKEFILE_LIST` rejection, startup boundaries, caller `MAKEFLAGS`, and ten
+  non-executing or error-ignoring modes.
 
 ## Scope Boundary
 

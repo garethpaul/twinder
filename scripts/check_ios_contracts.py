@@ -742,7 +742,19 @@ def check_ci_baseline_docs():
     )
     require("PYTHON ?= python3" in makefile_lines, "Makefile must preserve the Python command override")
     require("override PYTHON := $(value PYTHON)" in makefile_lines, "Makefile must freeze the Python override")
-    require("PYTHON must be a literal executable path, not Make syntax" in makefile, "Makefile must reject Python Make syntax")
+    for authority_contract in (
+        ".DEFAULT_GOAL := check",
+        ".PHONY: __repository-make-authority build check contract-test lint root-test test verify",
+        "override SHELL := /bin/sh",
+        "override .SHELLFLAGS := -c",
+        "PYTHON must be a literal executable path, not Make syntax",
+        "MAKEFLAGS must not be overridden for repository verification",
+        "non-executing or error-ignoring MAKEFLAGS are not supported",
+        "MAKEFILES must be empty; repository verification requires this Makefile to be loaded alone",
+        "MAKEFILE_LIST must not be overridden",
+        "repository Makefile must be loaded alone",
+    ):
+        require(authority_contract in makefile, f"Makefile must preserve authority contract: {authority_contract}")
     require('"$$ROOT/scripts/check_ios_contracts.py"' in makefile, "Makefile must use the rooted checker path")
     require('"$$ROOT/scripts/test_workflow_contract.py"' in makefile, "Makefile must run workflow contract mutations")
     require('"$$ROOT/scripts/test-makefile-root.sh"' in makefile, "Makefile must run authority regressions")
