@@ -15,6 +15,8 @@ controlled shell, startup-file, execution-mode, and Python expression state.
   values before later non-override target variables can alter them, pin
   `/bin/sh -c` against later non-override shell assignments, and invoke
   `/usr/bin/xcodebuild` without PATH lookup.
+- Python defaults to `/usr/bin/python3`; hosted matrices pass an absolute
+  setup-python interpreter through a repository-owned `-I -B` launcher.
 - Added an adversarial authority harness and pinned CI to `/usr/bin/make check`.
 
 ## Verification
@@ -25,9 +27,9 @@ controlled shell, startup-file, execution-mode, and Python expression state.
   path, command and environment Make-syntax rejection, command and environment
   `MAKEFILE_LIST` rejection, startup boundaries, caller `MAKEFLAGS`, and ten
   non-executing or error-ignoring modes.
-- Executable regressions reject later single-colon recipe replacement and prove
-  that later non-override root, Python, and shell assignments cannot redirect
-  checked-in commands.
+- Executable regressions reject later single-colon recipe replacement, PATH
+  shadowing, and hostile `sitecustomize.py`, while proving later non-override
+  root, Python, and shell assignments cannot redirect checked-in commands.
 
 ## Scope Boundary
 
@@ -35,9 +37,9 @@ This is a local checked-in-Makefile boundary, not a sandbox for caller-supplied
 Make programs. GNU Make startup files are parsed before repository checks, so
 their parse-time code remains outside the local trust boundary. Later makefiles
 that use GNU Make `override` directives likewise remain outside the local trust
-boundary because they are caller programs with Make-level authority. Python
-executable selection, including PATH resolution of the default `python3`, is
-also caller-controlled rather than authenticated by this repository.
+boundary because they are caller programs with Make-level authority. absolute
+Python executable selection is baked into recipes and uses isolated Python
+startup; explicit alternate interpreters remain caller authority.
 
 Within that boundary, later non-override assignments cannot redirect the
 reviewed root, Python command, or recipe shell, later single-colon recipes fail

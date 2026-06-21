@@ -15,6 +15,7 @@ printf '%s|%s|%s\n' "$PWD" "$0" "$*" >> "$TWINDER_COMMAND_LOG"
 EOF
 chmod +x "$FAKE_PYTHON"
 for script in test-makefile-root.sh check_ios_contracts.py test_deep_link_contract.py test_legacy_build_contract.py test_project_path_contract.py test_saved_profile_cell_contract.py test_saved_profile_model_contract.py test_saved_profile_selection_contract.py test_saved_profile_write_contract.py test_workflow_contract.py; do cp "$FAKE_PYTHON" "$CHECKOUT/scripts/$script"; done
+cp "$ROOT_DIR/scripts/run-python.sh" "$CHECKOUT/scripts/run-python.sh"; chmod +x "$CHECKOUT/scripts/run-python.sh"
 FAKE_SHELL="$TEMP_ROOT/fake-shell"; printf '#!/bin/sh\nprintf invoked >> %s\nexec /bin/sh "$@"\n' "'$SHELL_LOG'" >"$FAKE_SHELL"; chmod +x "$FAKE_SHELL"
 run_case() { target=$1; mode=$2; rm -f "$LOG" "$SHELL_LOG"; set +e; case "$mode" in default) (cd "$CONTROL_DIR"&&TWINDER_COMMAND_LOG="$LOG" /usr/bin/make --no-print-directory -f "$MAKEFILE" "PYTHON=$FAKE_PYTHON" "$target") >/dev/null 2>&1;; command-root) (cd "$CONTROL_DIR"&&TWINDER_COMMAND_LOG="$LOG" /usr/bin/make --no-print-directory -f "$MAKEFILE" ROOT="$ATTACKER_ROOT" "PYTHON=$FAKE_PYTHON" "$target") >/dev/null 2>&1;; environment-root) (cd "$CONTROL_DIR"&&ROOT="$ATTACKER_ROOT" TWINDER_COMMAND_LOG="$LOG" /usr/bin/make --no-print-directory -f "$MAKEFILE" "PYTHON=$FAKE_PYTHON" "$target") >/dev/null 2>&1;; command-shell) (cd "$CONTROL_DIR"&&TWINDER_COMMAND_LOG="$LOG" /usr/bin/make --no-print-directory -f "$MAKEFILE" SHELL="$FAKE_SHELL" "PYTHON=$FAKE_PYTHON" "$target") >/dev/null 2>&1;; environment-shell) (cd "$CONTROL_DIR"&&SHELL="$FAKE_SHELL" TWINDER_COMMAND_LOG="$LOG" /usr/bin/make --no-print-directory -f "$MAKEFILE" "PYTHON=$FAKE_PYTHON" "$target") >/dev/null 2>&1;; esac; status=$?; set -e; [ "$status" -eq 0 ]; [ ! -e "$SHELL_LOG" ]; [ "$target" = build ] || grep -Fq "$CHECKOUT" "$LOG"; }
 executed=0; for target in build check contract-test lint root-test test verify; do for mode in default command-root environment-root command-shell environment-shell; do run_case "$target" "$mode"; executed=$((executed+1)); done; done; [ "$executed" -eq 35 ]
@@ -81,8 +82,9 @@ rm -f "$LATER_SHELL_LOG"
 [ -s "$LATER_SHELL_LOG" ]
 PATH_PYTHON="$TEMP_ROOT/python3"; PATH_PYTHON_LOG="$TEMP_ROOT/path-python.log"; cp "$FAKE_PYTHON" "$PATH_PYTHON"
 rm -f "$PATH_PYTHON_LOG"
-(cd "$CONTROL_DIR"&&PATH="$TEMP_ROOT:/usr/bin:/bin" TWINDER_COMMAND_LOG="$PATH_PYTHON_LOG" /usr/bin/make --no-print-directory -f "$MAKEFILE" lint) >"$TEMP_ROOT/path-python" 2>&1
-[ -s "$PATH_PYTHON_LOG" ]
+if (cd "$CONTROL_DIR"&&PATH="$TEMP_ROOT:/usr/bin:/bin" TWINDER_COMMAND_LOG="$PATH_PYTHON_LOG" /usr/bin/make --no-print-directory -f "$MAKEFILE" lint) >"$TEMP_ROOT/path-python" 2>&1; then exit 1; fi
+[ ! -e "$PATH_PYTHON_LOG" ]
+SITE_DIR="$TEMP_ROOT/site"; SITE_MARKER="$TEMP_ROOT/sitecustomize-ran"; mkdir -p "$SITE_DIR"; printf '%s\n' "import os; open('$SITE_MARKER', 'w').close(); os._exit(0)" >"$SITE_DIR/sitecustomize.py"; (cd "$ROOT_DIR"&&PYTHONPATH="$SITE_DIR" /usr/bin/make --no-print-directory lint PYTHON=/usr/bin/python3) >"$TEMP_ROOT/sitecustomize" 2>&1; [ ! -e "$SITE_MARKER" ]
 PATH_XCODE="$TEMP_ROOT/xcodebuild"; PATH_XCODE_LOG="$TEMP_ROOT/path-xcode.log"; cat >"$PATH_XCODE" <<'SCRIPT'
 #!/bin/sh
 printf '%s\n' "$*" >> "$TWINDER_PATH_XCODE_LOG"
@@ -95,4 +97,4 @@ rm -f "$PATH_XCODE_LOG"
 [ ! -e "$PATH_XCODE_LOG" ]
 if (cd "$CONTROL_DIR"&&/usr/bin/make --no-print-directory -f "$MAKEFILE" MAKEFLAGS=-n check) >"$TEMP_ROOT/flags" 2>&1; then exit 1; fi; grep -Fq 'MAKEFLAGS must not be overridden' "$TEMP_ROOT/flags"
 for flag in -n --just-print --dry-run --recon -t --touch -q --question -i --ignore-errors; do if (cd "$CONTROL_DIR"&&/usr/bin/make "$flag" --no-print-directory -f "$MAKEFILE" check) >"$TEMP_ROOT/flag" 2>&1; then exit 1; fi; grep -Fq 'non-executing or error-ignoring MAKEFLAGS are not supported' "$TEMP_ROOT/flag"; done
-printf '%s\n' 'Make authority tests passed: 35 target/authority cases, literal hostile Python path, 2 raw Make-syntax rejections, 2 MAKEFILE_LIST rejections, 2 startup-boundary cases, 7 later recipe-replacement rejections, later root/Python and non-override shell protection, override/startup/PATH-Python boundary controls, PATH-Xcode rejection, caller MAKEFLAGS rejection, and 10 mode rejections'
+printf '%s\n' 'Make authority tests passed: 35 target/authority cases, literal hostile Python path, 2 raw Make-syntax rejections, 2 MAKEFILE_LIST rejections, 2 startup-boundary cases, 7 later recipe-replacement rejections, later root/Python and non-override shell protection, override/startup boundary controls, PATH-Python and PATH-Xcode rejection, isolated Python startup, caller MAKEFLAGS rejection, and 10 mode rejections'

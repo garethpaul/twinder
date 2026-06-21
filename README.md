@@ -79,8 +79,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   Caller-supplied Make programs using GNU Make `override` directives remain
   outside the local trust boundary. GNU Make startup files are parsed before
   repository checks, so startup code is also outside the local trust boundary.
-  Python executable selection, including PATH resolution of the default
-  `python3`, is caller-controlled and is not an authenticated repository asset.
+  absolute Python executable selection defaults to `/usr/bin/python3`, is baked
+  into recipes, and runs with isolated Python startup (`-I -B`) so `PATH`,
+  `PYTHONPATH`, user-site packages, and `sitecustomize.py` cannot replace checks.
 
 ## Testing and Verification
 

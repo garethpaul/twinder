@@ -10,9 +10,9 @@
 - Rejected later single-colon recipe replacement, embedded reviewed root and
   Python command values before later non-override target assignments, pinned
   the public recipe shell, and removed PATH control of `xcodebuild`.
-- Narrowed the documented boundary: GNU Make `override` directives, startup
-  parse code, and caller-controlled Python executable selection remain outside
-  the local trust boundary.
+- Kept GNU Make startup parse code outside the enforceable boundary while
+  requiring absolute interpreters and isolating Python from `PYTHONPATH`,
+  user-site packages, and `sitecustomize.py`.
 
 ## 2026-06-19
 
