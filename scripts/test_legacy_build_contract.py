@@ -16,8 +16,8 @@ mutations = {
     "missing Xcode major detection": baseline.replace("xcode_major=$$(xcodebuild -version", "xcode_major=$$(echo", 1),
     "accepts modern Xcode": baseline.replace('if [ "$$xcode_major" -le 6 ]', 'if [ "$$xcode_major" -ge 6 ]', 1),
     "build before version guard": baseline.replace(
-        '\t\tif [ "$$xcode_major" -le 6 ]; then \\\n\t\t\tcd "$(ROOT)" && xcodebuild',
-        '\t\tcd "$(ROOT)" && xcodebuild; \\\n\t\tif [ "$$xcode_major" -le 6 ]; then \\\n\t\t\ttrue',
+        '\t\tif [ "$$xcode_major" -le 6 ]; then \\\n\t\t\tcd "$$ROOT" && xcodebuild',
+        '\t\tcd "$$ROOT" && xcodebuild; \\\n\t\tif [ "$$xcode_major" -le 6 ]; then \\\n\t\t\ttrue',
         1,
     ),
     "silent compatibility skip": baseline.replace(

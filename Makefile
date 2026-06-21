@@ -1,28 +1,81 @@
-.PHONY: build check contract-test lint test verify
+.DEFAULT_GOAL := check
+.PHONY: __repository-make-authority build check contract-test lint root-test test verify
+.SECONDEXPANSION:
 
-override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 PYTHON ?= python3
+override PYTHON := $(value PYTHON)
+export PYTHON
+override REPOSITORY_MAKE_DOLLAR := $$
+override REPOSITORY_MAKE_OPEN := (
+ifneq ($(findstring $(REPOSITORY_MAKE_DOLLAR)$(REPOSITORY_MAKE_OPEN),$(value PYTHON)),)
+$(error PYTHON must be a literal executable path, not Make syntax)
+endif
+override SHELL := /bin/sh
+override .SHELLFLAGS := -c
+
+ifneq ($(filter command line,$(origin MAKEFLAGS)),)
+$(error MAKEFLAGS must not be overridden for repository verification)
+endif
+override REPOSITORY_MAKE_FIRST_FLAGS := $(firstword $(MAKEFLAGS))
+ifneq ($(filter -%,$(REPOSITORY_MAKE_FIRST_FLAGS)),)
+override REPOSITORY_MAKE_FIRST_FLAGS :=
+endif
+override REPOSITORY_MAKE_SHORT_FLAGS := $(REPOSITORY_MAKE_FIRST_FLAGS) $(filter-out --%,$(filter -%,$(MAKEFLAGS)))
+ifneq ($(findstring n,$(REPOSITORY_MAKE_SHORT_FLAGS)),)
+$(error non-executing or error-ignoring MAKEFLAGS are not supported for repository verification)
+endif
+ifneq ($(findstring t,$(REPOSITORY_MAKE_SHORT_FLAGS)),)
+$(error non-executing or error-ignoring MAKEFLAGS are not supported for repository verification)
+endif
+ifneq ($(findstring q,$(REPOSITORY_MAKE_SHORT_FLAGS)),)
+$(error non-executing or error-ignoring MAKEFLAGS are not supported for repository verification)
+endif
+ifneq ($(findstring i,$(REPOSITORY_MAKE_SHORT_FLAGS)),)
+$(error non-executing or error-ignoring MAKEFLAGS are not supported for repository verification)
+endif
+ifneq ($(filter --just-print --dry-run --recon --touch --question --ignore-errors,$(MAKEFLAGS)),)
+$(error non-executing or error-ignoring MAKEFLAGS are not supported for repository verification)
+endif
+ifneq ($(strip $(MAKEFILES)),)
+$(error MAKEFILES must be empty; repository verification requires this Makefile to be loaded alone)
+endif
+override MAKEFILES :=
+ifneq ($(origin MAKEFILE_LIST),file)
+$(error MAKEFILE_LIST must not be overridden)
+endif
+override ROOT := $(shell path='$(subst ','"'"',$(value MAKEFILE_LIST))'; path=$$(printf '%s' "$$path" | /usr/bin/sed 's/^ //'); [ -f "$$path" ] || exit 1; directory=$$(/usr/bin/dirname -- "$$path"); CDPATH= cd -- "$$directory" && /bin/pwd -P)
+export ROOT
+ifeq ($(strip $(ROOT)),)
+$(error repository Makefile path could not be resolved)
+endif
+
+build check contract-test lint root-test test verify: $$(if $$(filter file,$$(origin MAKEFILE_LIST)),,$$(error MAKEFILE_LIST must not be overridden))
+build check contract-test lint root-test test verify: $$(if $$(shell path=$$$$(/usr/bin/printf '%s' '$$(subst ','"'"',$$(MAKEFILE_LIST))' | /usr/bin/sed 's/^ //') && [ -f "$$$$path" ] && /usr/bin/printf '%s' ok),,$$(error repository Makefile must be loaded alone))
+build check contract-test lint root-test test verify: __repository-make-authority
+
+__repository-make-authority::
+	@:
 
 lint:
-	$(PYTHON) "$(ROOT)/scripts/check_ios_contracts.py"
+	"$$PYTHON" "$$ROOT/scripts/check_ios_contracts.py"
 
 test: lint
-	$(PYTHON) "$(ROOT)/scripts/test_deep_link_contract.py"
-	$(PYTHON) "$(ROOT)/scripts/test_legacy_build_contract.py"
-	$(PYTHON) "$(ROOT)/scripts/test_project_path_contract.py"
-	$(PYTHON) "$(ROOT)/scripts/test_saved_profile_cell_contract.py"
-	$(PYTHON) "$(ROOT)/scripts/test_saved_profile_model_contract.py"
-	$(PYTHON) "$(ROOT)/scripts/test_saved_profile_selection_contract.py"
-	$(PYTHON) "$(ROOT)/scripts/test_saved_profile_write_contract.py"
+	"$$PYTHON" "$$ROOT/scripts/test_deep_link_contract.py"
+	"$$PYTHON" "$$ROOT/scripts/test_legacy_build_contract.py"
+	"$$PYTHON" "$$ROOT/scripts/test_project_path_contract.py"
+	"$$PYTHON" "$$ROOT/scripts/test_saved_profile_cell_contract.py"
+	"$$PYTHON" "$$ROOT/scripts/test_saved_profile_model_contract.py"
+	"$$PYTHON" "$$ROOT/scripts/test_saved_profile_selection_contract.py"
+	"$$PYTHON" "$$ROOT/scripts/test_saved_profile_write_contract.py"
 
 contract-test:
-	$(PYTHON) "$(ROOT)/scripts/test_workflow_contract.py"
+	"$$PYTHON" "$$ROOT/scripts/test_workflow_contract.py"
 
 build:
 	@if command -v xcodebuild >/dev/null 2>&1; then \
 		xcode_major=$$(xcodebuild -version | awk 'NR == 1 { split($$2, version, "."); print version[1] }'); \
 		if [ "$$xcode_major" -le 6 ]; then \
-			cd "$(ROOT)" && xcodebuild -project Twinder.xcodeproj -target Twinder -sdk iphonesimulator -configuration Debug CODE_SIGNING_ALLOWED=NO build; \
+			cd "$$ROOT" && xcodebuild -project Twinder.xcodeproj -target Twinder -sdk iphonesimulator -configuration Debug CODE_SIGNING_ALLOWED=NO build; \
 		else \
 			echo "iOS build skipped: this project requires Xcode 6.x for its pre-versioned Swift sources."; \
 		fi; \
@@ -30,6 +83,9 @@ build:
 		echo "iOS build skipped: xcodebuild is not available on this host."; \
 	fi
 
-verify: lint contract-test test build
+root-test:
+	/bin/sh "$$ROOT/scripts/test-makefile-root.sh"
+
+verify: root-test lint contract-test test build
 
 check: verify
