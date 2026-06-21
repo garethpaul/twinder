@@ -2,7 +2,7 @@ CHECKOUT_ACTION = "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10"
 SETUP_ACTION = "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405"
 
 REVIEWED_WORKFLOW_LINES = tuple(
-    line.rstrip()
+    line.rstrip(" \t")
     for line in f"""name: Check
 on:
   pull_request:
@@ -38,7 +38,7 @@ jobs:
 
 
 def _significant_lines(workflow):
-    return tuple(line.rstrip() for line in workflow.splitlines() if line.strip())
+    return tuple(line.rstrip(" \t") for line in workflow.splitlines() if line.strip())
 
 
 def validate(workflow):

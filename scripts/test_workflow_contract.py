@@ -35,6 +35,7 @@ mutations = {
     ),
     "missing pull request": mutate("missing pull request", "  pull_request:\n", ""),
     "missing push": mutate("missing push", "  push:\n    branches:\n      - master\n", ""),
+    "unicode branch suffix": mutate("unicode branch suffix", "      - master", "      - master\u00a0"),
     "missing manual dispatch": mutate("missing manual dispatch", "  workflow_dispatch:\n", ""),
     "duplicate runner": mutate("duplicate runner", "    runs-on: ubuntu-24.04", "    runs-on: ubuntu-24.04\n    runs-on: ubuntu-24.04"),
     "unbounded job": mutate("unbounded job", "    timeout-minutes: 10\n", ""),
