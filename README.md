@@ -71,6 +71,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   Xcode releases report the documented legacy skip instead of attempting an
   unsupported Swift migration. The checked-in bridge header path is relative
   to the repository rather than an individual developer home directory.
+- Run `make root-test` to verify Make startup, shell, Python, root, and
+  execution-mode authority with adversarial external-directory cases.
 
 ## Testing and Verification
 
@@ -105,7 +107,7 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   alphabet, and open only when iOS accepts the constructed route.
 - Completed maintenance plans live under `docs/plans` and are checked by
   `make check`.
-- GitHub Actions runs the same static contracts on Python 3.10, 3.12, and 3.14
+- GitHub Actions runs `/usr/bin/make check` on Python 3.10, 3.12, and 3.14
   on Ubuntu 24.04 with read-only permissions, credential-free checkout, and
   immutable action pins. Dependency-free mutation tests reject contradictory
   or relocated credential settings and other workflow policy regressions.
@@ -171,6 +173,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   fail-closed Twitter profile routing.
 - See `docs/plans/2026-06-14-legacy-setup-notes.md` for the historical Xcode,
   CocoaPods, TwitterKit, Fabric, and Swift compatibility boundary.
+- See `docs/plans/2026-06-21-make-authority-isolation.md` for the complete Make
+  startup, shell, Python, and execution-mode authority boundary.
 
 ## Contributing
 

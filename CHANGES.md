@@ -1,5 +1,13 @@
 # Changes
 
+## 2026-06-21
+
+- Hardened the Make verification gate against caller-controlled Python
+  expressions, shells, startup files, extra makefiles, and non-executing or
+  error-ignoring modes.
+- Added adversarial Make authority coverage and pinned hosted verification to
+  `/usr/bin/make check` without changing the legacy iOS application.
+
 ## 2026-06-19
 
 - Isolated each saved-profile insertion in its own Core Data context and rolled

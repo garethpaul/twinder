@@ -737,13 +737,16 @@ def check_ci_baseline_docs():
     require(not project_errors, project_errors[0] if project_errors else "")
     makefile_lines = set(makefile.splitlines())
     require(
-        "override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile_lines,
+        any(line.startswith("override ROOT := $(shell path=") for line in makefile_lines),
         "Makefile must protect commands rooted at the repository",
     )
     require("PYTHON ?= python3" in makefile_lines, "Makefile must preserve the Python command override")
-    require('"$(ROOT)/scripts/check_ios_contracts.py"' in makefile, "Makefile must use the rooted checker path")
-    require('"$(ROOT)/scripts/test_workflow_contract.py"' in makefile, "Makefile must run workflow contract mutations")
-    require('cd "$(ROOT)" && xcodebuild' in makefile, "Makefile must run xcodebuild from the repository root")
+    require("override PYTHON := $(value PYTHON)" in makefile_lines, "Makefile must freeze the Python override")
+    require("PYTHON must be a literal executable path, not Make syntax" in makefile, "Makefile must reject Python Make syntax")
+    require('"$$ROOT/scripts/check_ios_contracts.py"' in makefile, "Makefile must use the rooted checker path")
+    require('"$$ROOT/scripts/test_workflow_contract.py"' in makefile, "Makefile must run workflow contract mutations")
+    require('"$$ROOT/scripts/test-makefile-root.sh"' in makefile, "Makefile must run authority regressions")
+    require('cd "$$ROOT" && xcodebuild' in makefile, "Makefile must run xcodebuild from the repository root")
 
     docs = {
         "README.md": ["GitHub Actions", "docs/plans/2026-06-10-ci-baseline.md"],
