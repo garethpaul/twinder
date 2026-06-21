@@ -30,6 +30,12 @@ controlled shell, startup-file, execution-mode, and Python expression state.
 - Executable regressions reject later single-colon recipe replacement, PATH
   shadowing, and hostile `sitecustomize.py`, while proving later non-override
   root, Python, and shell assignments cannot redirect checked-in commands.
+- Workflow regressions reject quoted write permissions, custom
+  shell/default/environment state, unreviewed steps, YAML command wrapping,
+  and any command other than the exact reviewed `make check` invocation.
+- A base-owned `pull_request_target` gate checks the pull-request workflow as
+  inert bytes, never checks out the candidate head, and rejects candidate
+  changes to the trusted gate and policy files.
 
 ## Scope Boundary
 
@@ -40,6 +46,12 @@ that use GNU Make `override` directives likewise remain outside the local trust
 boundary because they are caller programs with Make-level authority. absolute
 Python executable selection is baked into recipes and uses isolated Python
 startup; explicit alternate interpreters remain caller authority.
+
+The local workflow contract validates the checked-in workflow shape but cannot
+authenticate itself. The provider-run trusted gate closes that specific gap by
+executing only the base revision of its policy and treating candidate files as
+data. Updating the trusted workflow or policy remains outside the ordinary pull
+request path and requires a separate base-maintenance action.
 
 Within that boundary, later non-override assignments cannot redirect the
 reviewed root, Python command, or recipe shell, later single-colon recipes fail
