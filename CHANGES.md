@@ -1,5 +1,22 @@
 # Changes
 
+## 2026-06-25 08:55 PDT
+
+- **Priority:** P1 asynchronous UI lifecycle correctness.
+- **Summary:** Prevented nested Twitter callbacks from retaining and mutating
+  swipe cards after they leave the window.
+- **Work:** Added weak captures, request-generation and profile identity checks,
+  main-queue UI dispatch, detached-card invalidation, and six hostile mutations.
+- **Threads:** No open issue or pull request covered this focused lifecycle gap.
+- **Validation:** The test-first contract failed against the strong-capture
+  implementation; six hostile mutations, root and external-directory
+  `make check`, and `git diff --check` then passed. Native build execution was
+  skipped because `xcodebuild` is unavailable.
+- **Blockers:** Native build requires the historical Xcode 6-era Swift toolchain
+  and retired Fabric/TwitterKit services.
+- **Next action:** Run full portable verification, review the exact PR head, and
+  merge only after hosted checks pass.
+
 ## 2026-06-21
 
 - Hardened the Make verification gate against caller-controlled Python

@@ -32,6 +32,7 @@ Priority:
 - Saved-profile writes persist before publishing success. Use an isolated
   context, and bind optional legacy fields before use.
 - Keep swipe cards from retaining or displaying stale asynchronous images
+- Keep embedded tweet callbacks from retaining or mutating detached swipe cards
 - Cancel replaced or released swipe-card image tasks and reject older same-URL
   request generations
 - Encode Twitter profile deep-link query values, validate the ASCII handle

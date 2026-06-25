@@ -65,6 +65,8 @@
 - Saved-profile writes persist before publishing success. Use an isolated context and roll back failures.
 - Persisted optional favorite fields must be bound before use.
 - Twitter deep links accept only ASCII handles of 1-15 characters.
+- Embedded tweet callbacks weakly capture swipe cards, match the current
+  request generation and profile, and update attached UI on the main queue.
 - See `docs/plans/2026-06-08-profile-image-loading-guards.md` for profile-card image URL and decode guard coverage.
 - `Pods/` is vendored dependency code; do not hand-edit it unless intentionally updating dependencies.
 

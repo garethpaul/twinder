@@ -58,6 +58,8 @@ Helpful reports include:
 - Swipe-card image completions weakly capture the card and verify that its
   current profile URL and request generation still match before updating UI
   state; replacement loads and card release cancel the active task.
+- Embedded tweet callbacks must weakly capture swipe cards, reject detached or
+  superseded request generations and profiles, and mutate UI on the main queue.
 - Twitter profile routes build the screen name as a URL query item and open
   only a successfully constructed URL that iOS reports as supported after the
   handle passes the ASCII Twitter alphabet and length checks.

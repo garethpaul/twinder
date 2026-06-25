@@ -111,6 +111,9 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   before applying a late completion. Replacement loads and released cards
   cancel their active task, and request generations reject older same-URL
   completions.
+- Embedded tweet lookups weakly capture swipe cards, invalidate callbacks when
+  cards leave the window, verify request/profile identity, and add tweet UI on
+  the main queue.
 - Twitter profile deep links encode the screen name as a query item, avoid URL
   force unwraps, reject handles outside the 1-15 character ASCII Twitter
   alphabet, and open only when iOS accepts the constructed route.
@@ -189,6 +192,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   CocoaPods, TwitterKit, Fabric, and Swift compatibility boundary.
 - See `docs/plans/2026-06-21-make-authority-isolation.md` for the narrowed local
   Make authority boundary and its caller-program exclusions.
+- See `docs/plans/2026-06-25-tweet-embed-lifecycle.md` for swipe-card embedded
+  tweet callback ownership and detached-card invalidation.
 
 ## Contributing
 
