@@ -17,6 +17,7 @@ class TweepPickerView : MDCSwipeToChooseView {
     var infoView: UIView = UIView()
     private var imageTask: NSURLSessionDataTask?
     private var imageRequestGeneration = 0
+    private var tweetRequestGeneration = 0
 
     deinit {
         imageTask?.cancel()
@@ -24,6 +25,13 @@ class TweepPickerView : MDCSwipeToChooseView {
 
     required init(coder: NSCoder) {
         super.init(coder: coder)
+    }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if self.window == nil {
+            tweetRequestGeneration += 1
+        }
     }
 
     init(frame: CGRect, tweep: Tweep, options: MDCSwipeToChooseViewOptions) {
@@ -120,15 +128,35 @@ class TweepPickerView : MDCSwipeToChooseView {
         let api = APIClient()
         if let selectedTweep = self.tweep {
             let screenName = selectedTweep.screen_name
-            api.getTweet(screenName) { (tweet_result: String) in
-                if tweet_result.isEmpty {
-                    return
-                }
-                Twitter.sharedInstance().APIClient.loadTweetWithID(tweet_result) { (tweet: TWTRTweet!, error: NSError!) in
-                    if let loadedTweet = tweet {
-                        let tweetView = TWTRTweetView(tweet: loadedTweet)
-                        tweetView.showBorder = false
-                        self.infoView.addSubview(tweetView)
+            tweetRequestGeneration += 1
+            let requestGeneration = tweetRequestGeneration
+            api.getTweet(screenName) { [weak self] (tweet_result: String) in
+                if let strongSelf = self {
+                    if strongSelf.tweetRequestGeneration == requestGeneration {
+                        if let currentTweep = strongSelf.tweep {
+                            if currentTweep.screen_name == screenName {
+                                if tweet_result.isEmpty {
+                                    return
+                                }
+                                Twitter.sharedInstance().APIClient.loadTweetWithID(tweet_result) { [weak self] (tweet: TWTRTweet!, error: NSError!) in
+                                    dispatch_async(dispatch_get_main_queue()) {
+                                        if let strongSelf = self {
+                                            if strongSelf.tweetRequestGeneration == requestGeneration {
+                                                if let currentTweep = strongSelf.tweep {
+                                                    if currentTweep.screen_name == screenName {
+                                                        if let loadedTweet = tweet {
+                                                            let tweetView = TWTRTweetView(tweet: loadedTweet)
+                                                            tweetView.showBorder = false
+                                                            strongSelf.infoView.addSubview(tweetView)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
