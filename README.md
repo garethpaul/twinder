@@ -97,8 +97,8 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   undecodable responses before returning to UI code on the main queue.
 - The current-user profile controller weakly owns both lookup stages, cancels
   image transport when it leaves, restarts a fresh lookup when it reappears,
-  and verifies request generation plus Twitter account identity before changing
-  its image view.
+  clears stale account imagery, and verifies request generation plus Twitter
+  account identity before changing its image view.
 - Saved-profile rows clear reused images and verify that asynchronous image
   results still belong to the row before updating the cell.
 - Reused saved-profile cells cancel obsolete image tasks and reject stale

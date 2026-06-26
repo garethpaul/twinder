@@ -43,18 +43,20 @@ def validation_errors(source):
     ):
         errors.append("returning to the profile must start a fresh image lookup")
 
-    setup = source[source.find("if let session = Twitter.sharedInstance().session()"):source.find("TweepPicture(screenName)")]
+    setup = source[source.find("func loadProfileImage()"):source.find("TweepPicture(screenName)")]
     if not ordered(
         setup,
         (
-            "let screenName = session.userName",
             "profileImageTask?.cancel()",
             "profileImageTask = nil",
             "profileImageGeneration += 1",
+            "peepImg.image = nil",
             "let requestGeneration = profileImageGeneration",
+            "if let session = Twitter.sharedInstance().session()",
+            "let screenName = session.userName",
         ),
     ):
-        errors.append("each profile image lookup must own a fresh request generation")
+        errors.append("each profile appearance must clear stale images and own a fresh generation")
 
     lookup = source[source.find("TweepPicture(screenName)"):source.find("override func viewWillDisappear")]
     before_transport, separator, after_transport = lookup.partition(

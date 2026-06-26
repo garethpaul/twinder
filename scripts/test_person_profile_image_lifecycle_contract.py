@@ -20,6 +20,7 @@ def main():
         "strong profile lookup capture": source.replace("TweepPicture(screenName){ [weak self]", "TweepPicture(screenName){", 1),
         "retain image transport capture": source.replace("pic.get(imageURL, {[weak self] image, error in", "pic.get(imageURL, {image, error in", 1),
         "remove generation invalidation": source.replace("        profileImageGeneration += 1\n", "", 1),
+        "retain stale account image": source.replace("        peepImg.image = nil\n", "", 1),
         "remove disappearance cancellation": source.replace("        profileImageTask?.cancel()\n", "", 1),
         "remove appearance reload": source.replace("        loadProfileImage()\n", "", 1),
         "remove lookup main dispatch": source.replace("            dispatch_async(dispatch_get_main_queue()) {\n", "", 1).replace("            }\n        }\n\n    }\n\n    override func viewWillDisappear", "        }\n\n    }\n\n    override func viewWillDisappear", 1),

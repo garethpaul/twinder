@@ -8,7 +8,7 @@
 - **Work:** Added weak captures to both lookup stages, cancellable task
   ownership, request generations, main-queue state checks, active-account
   identity validation at both stages, teardown cancellation, reappearance
-  reload, and eleven hostile mutations.
+  reload, stale-image clearing, and twelve hostile mutations.
 - **Threads:** No open issue or pull request covered this focused lifecycle gap.
 - **Files:** Updated `PersonController.swift`, the canonical static checker and
   Make gate, project guidance, lifecycle contracts, and a completed plan.

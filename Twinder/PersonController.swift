@@ -51,13 +51,15 @@ class PersonController: UIViewController {
     }
 
     func loadProfileImage() {
+        profileImageTask?.cancel()
+        profileImageTask = nil
+        profileImageGeneration += 1
+        peepImg.image = nil
+        let requestGeneration = profileImageGeneration
+
         // Get User's Picture
         if let session = Twitter.sharedInstance().session() {
             let screenName = session.userName
-            profileImageTask?.cancel()
-            profileImageTask = nil
-            profileImageGeneration += 1
-            let requestGeneration = profileImageGeneration
             TweepPicture(screenName){ [weak self] (result: String) in
                 dispatch_async(dispatch_get_main_queue()) {
                     if let strongSelf = self {

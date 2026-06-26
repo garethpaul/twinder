@@ -18,6 +18,8 @@ active Twitter session still represented the account that started the work.
   controller leaves, and during deinitialization.
 - Start a fresh generation when the same controller reappears after a cancelled
   navigation-away load.
+- Clear the visible image before checking the current session so a missing or
+  replaced account cannot inherit the previous account's image.
 - Bind every completion to a request generation and the originating Twitter
   screen name before applying the decoded image.
 
@@ -25,7 +27,7 @@ active Twitter session still represented the account that started the work.
 
 - The portable lifecycle contract requires weak captures, main-queue lookup
   ownership, cancellation, generation matching, and current-account identity.
-- Eleven hostile mutations remove each boundary and must be rejected.
+- Twelve hostile mutations remove each boundary and must be rejected.
 - `make check` remains the canonical verification gate; a compatible Xcode 6
   environment and retired TwitterKit service access remain necessary for native
   runtime validation.
