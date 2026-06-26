@@ -16,6 +16,7 @@ from saved_profile_write_contract import validation_errors as write_validation_e
 from deep_link_contract import validation_errors as deep_link_validation_errors
 from legacy_build_contract import validation_errors as build_validation_errors
 from project_path_contract import validation_errors as project_path_validation_errors
+from person_profile_image_lifecycle_contract import validation_errors as person_profile_image_lifecycle_errors
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,6 +39,7 @@ LEGACY_SETUP_NOTES_PLAN = DOCS_PLANS / "2026-06-14-legacy-setup-notes.md"
 SAVED_PROFILE_IMAGE_CANCELLATION_PLAN = DOCS_PLANS / "2026-06-16-saved-profile-image-cancellation.md"
 SAFE_SAVED_PROFILE_SELECTION_PLAN = DOCS_PLANS / "2026-06-16-safe-saved-profile-selection.md"
 SAVED_PROFILE_WRITE_PLAN = DOCS_PLANS / "2026-06-17-saved-profile-write-transaction.md"
+PERSON_PROFILE_IMAGE_LIFECYCLE_PLAN = DOCS_PLANS / "2026-06-26-person-profile-image-lifecycle.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -278,6 +280,9 @@ def check_profile_image_loading_guards():
 
 def check_person_profile_image_guards():
     source = read_text("Twinder/PersonController.swift")
+
+    lifecycle_errors = person_profile_image_lifecycle_errors(source)
+    require(not lifecycle_errors, lifecycle_errors[0] if lifecycle_errors else "")
 
     require(
         "Twitter().session().userName" not in source,
@@ -688,6 +693,10 @@ def check_docs_plans():
     require(
         SAVED_PROFILE_WRITE_PLAN in plans,
         f"{SAVED_PROFILE_WRITE_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(
+        PERSON_PROFILE_IMAGE_LIFECYCLE_PLAN in plans,
+        f"{PERSON_PROFILE_IMAGE_LIFECYCLE_PLAN.relative_to(ROOT)} must be present",
     )
 
     cancellation_plan = SAVED_PROFILE_IMAGE_CANCELLATION_PLAN.read_text(encoding="utf-8")

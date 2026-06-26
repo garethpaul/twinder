@@ -67,6 +67,9 @@
 - Twitter deep links accept only ASCII handles of 1-15 characters.
 - Embedded tweet callbacks weakly capture swipe cards, match the current
   request generation and profile, and update attached UI on the main queue.
+- Current-user profile image callbacks weakly capture their controller, match
+  the active request generation and Twitter account, and cancel transport when
+  the profile leaves.
 - See `docs/plans/2026-06-08-profile-image-loading-guards.md` for profile-card image URL and decode guard coverage.
 - `Pods/` is vendored dependency code; do not hand-edit it unless intentionally updating dependencies.
 

@@ -95,6 +95,10 @@ The setup commands above are derived from repository files. Legacy mobile, Pytho
   URLSession tasks off the main queue, time
   out after 15 seconds, and reject non-success, non-image, oversized, or
   undecodable responses before returning to UI code on the main queue.
+- The current-user profile controller weakly owns both lookup stages, cancels
+  image transport when it leaves, restarts a fresh lookup when it reappears,
+  and verifies request generation plus Twitter account identity before changing
+  its image view.
 - Saved-profile rows clear reused images and verify that asynchronous image
   results still belong to the row before updating the cell.
 - Reused saved-profile cells cancel obsolete image tasks and reject stale
@@ -194,6 +198,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   Make authority boundary and its caller-program exclusions.
 - See `docs/plans/2026-06-25-tweet-embed-lifecycle.md` for swipe-card embedded
   tweet callback ownership and detached-card invalidation.
+- See `docs/plans/2026-06-26-person-profile-image-lifecycle.md` for current-user
+  profile image cancellation, weak captures, and account identity checks.
 
 ## Contributing
 
