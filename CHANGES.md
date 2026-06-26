@@ -1,5 +1,25 @@
 # Changes
 
+## 2026-06-26 03:58 PDT
+
+- **Priority:** P1 asynchronous account and UI lifecycle correctness.
+- **Summary:** Prevented current-user profile image callbacks from retaining or
+  mutating a controller after navigation, logout, or account replacement.
+- **Work:** Added weak captures to both lookup stages, cancellable task
+  ownership, request generations, main-queue state checks, active-account
+  identity validation at both stages, teardown cancellation, reappearance
+  reload, stale-image clearing, and twelve hostile mutations.
+- **Threads:** No open issue or pull request covered this focused lifecycle gap.
+- **Files:** Updated `PersonController.swift`, the canonical static checker and
+  Make gate, project guidance, lifecycle contracts, and a completed plan.
+- **Validation:** The test-first contract failed on strong, unowned callbacks.
+  Focused mutations, root/external `make check`, and hosted checks are required
+  before merge.
+- **Blockers:** Native behavior still requires the historical Xcode 6-era Swift
+  toolchain and retired Fabric/TwitterKit services.
+- **Next action:** Review the exact branch head and merge only after hosted
+  checks pass.
+
 ## 2026-06-25 08:55 PDT
 
 - **Priority:** P1 asynchronous UI lifecycle correctness.

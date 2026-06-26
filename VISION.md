@@ -41,6 +41,8 @@ Priority:
 - Require bounded HTTPS transport and validated responses for shared profile
   image downloads
 - Guard current-user profile image loading before using session or image data
+- Cancel and identity-bind current-user profile image callbacks across logout
+  and navigation
 - Complete current-user profile image lookup failures without logging Twitter
   API details
 - Complete missing or failing timeline tweet lookups without logging tweet IDs
