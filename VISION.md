@@ -27,6 +27,8 @@ Priority:
 - Keep reused saved-profile rows from displaying stale asynchronous images
 - Reused saved-profile cells cancel obsolete image tasks and reject stale
   completions.
+- Keep root profile image callbacks weakly captured, generation-bound,
+  selected-profile-bound, and cancelled when hidden.
 - Reused saved-profile cells remove owned overlays before reconfiguration.
 - Saved-profile selection validates table identity before opening Twitter.
 - Saved-profile writes persist before publishing success. Use an isolated

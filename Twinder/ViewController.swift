@@ -15,21 +15,50 @@ class ViewController: UIViewController {
 
     var tweep: Tweep?
     var lView: UIImageView!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    var profileImageTask: NSURLSessionDataTask?
+    var profileImageGeneration = 0
+
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        loadProfileImage()
+    }
+
+    override func viewWillDisappear(animated: Bool) {
+        profileImageGeneration += 1
+        profileImageTask?.cancel()
+        profileImageTask = nil
+        super.viewWillDisappear(animated)
+    }
+
+    func loadProfileImage() {
+        profileImageTask?.cancel()
+        profileImageTask = nil
+        profileImageGeneration += 1
+        imageView.image = nil
+        let requestGeneration = profileImageGeneration
 
         if let selectedTweep = self.tweep {
             let pic = Picture()
-            let url_string = selectedTweep.image
-            if let imageURL = NSURL(string: url_string) {
-                pic.get(imageURL, {image, error in
-                    if let newImg = image {
-                        self.imageView.image = newImg
+            let imageURLString = selectedTweep.image
+            if let imageURL = NSURL(string: imageURLString) {
+                profileImageTask = pic.get(imageURL, {[weak self] image, error in
+                    if let strongSelf = self {
+                        if strongSelf.profileImageGeneration == requestGeneration {
+                            if let currentTweep = strongSelf.tweep {
+                                if currentTweep.image == imageURLString {
+                                    if let newImg = image {
+                                        strongSelf.imageView.image = newImg
+                                    }
+                                }
+                            }
+                        }
                     }
                 })
             }
-
         }
+    }
+
+    deinit {
+        profileImageTask?.cancel()
     }
 }

@@ -17,6 +17,7 @@ from deep_link_contract import validation_errors as deep_link_validation_errors
 from legacy_build_contract import validation_errors as build_validation_errors
 from project_path_contract import validation_errors as project_path_validation_errors
 from person_profile_image_lifecycle_contract import validation_errors as person_profile_image_lifecycle_errors
+from root_profile_image_lifecycle_contract import validation_errors as root_profile_image_lifecycle_errors
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,6 +41,7 @@ SAVED_PROFILE_IMAGE_CANCELLATION_PLAN = DOCS_PLANS / "2026-06-16-saved-profile-i
 SAFE_SAVED_PROFILE_SELECTION_PLAN = DOCS_PLANS / "2026-06-16-safe-saved-profile-selection.md"
 SAVED_PROFILE_WRITE_PLAN = DOCS_PLANS / "2026-06-17-saved-profile-write-transaction.md"
 PERSON_PROFILE_IMAGE_LIFECYCLE_PLAN = DOCS_PLANS / "2026-06-26-person-profile-image-lifecycle.md"
+ROOT_PROFILE_IMAGE_LIFECYCLE_PLAN = DOCS_PLANS / "2026-06-27-root-profile-image-lifecycle.md"
 CI_WORKFLOW = ROOT / ".github/workflows/check.yml"
 
 
@@ -225,12 +227,15 @@ def check_profile_image_loading_guards():
     view_controller = read_text("Twinder/ViewController.swift")
     picture = read_text("Twinder/Picture.swift")
 
+    lifecycle_errors = root_profile_image_lifecycle_errors(view_controller)
+    require(not lifecycle_errors, lifecycle_errors[0] if lifecycle_errors else "")
+
     require(
         "tweep!.image" not in view_controller,
         "ViewController must not force-unwrap the selected Tweep image URL",
     )
     require(
-        "NSURL(string: url_string)!" not in view_controller,
+        "NSURL(string: imageURLString)!" not in view_controller,
         "ViewController must not force-unwrap profile image URL construction",
     )
     require(
@@ -238,7 +243,7 @@ def check_profile_image_loading_guards():
         "ViewController must guard selected Tweep before image loading",
     )
     require(
-        "if let imageURL = NSURL(string: url_string)" in view_controller,
+        "if let imageURL = NSURL(string: imageURLString)" in view_controller,
         "ViewController must guard profile image URL construction",
     )
     require(
@@ -697,6 +702,10 @@ def check_docs_plans():
     require(
         PERSON_PROFILE_IMAGE_LIFECYCLE_PLAN in plans,
         f"{PERSON_PROFILE_IMAGE_LIFECYCLE_PLAN.relative_to(ROOT)} must be present",
+    )
+    require(
+        ROOT_PROFILE_IMAGE_LIFECYCLE_PLAN in plans,
+        f"{ROOT_PROFILE_IMAGE_LIFECYCLE_PLAN.relative_to(ROOT)} must be present",
     )
 
     cancellation_plan = SAVED_PROFILE_IMAGE_CANCELLATION_PLAN.read_text(encoding="utf-8")

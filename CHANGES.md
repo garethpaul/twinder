@@ -1,5 +1,25 @@
 # Changes
 
+## 2026-06-27 - P2 - Own root profile image lifecycle
+
+- **Summary:** Prevented the root profile image callback from retaining or
+  stale-mutating its controller after navigation or profile replacement.
+- **Work:** Added cancellable task ownership, request generations, selected
+  profile identity checks, weak capture, stale-image clearing, appearance
+  reload, teardown cancellation, and eight hostile mutations.
+- **Validation:** The focused contract failed before implementation and passes
+  after the lifecycle guards. Repository and external-directory `make check`
+  passed. Hosted Check run `28273923366`, trusted workflow run `28273922860`,
+  and CodeQL run `28273922369` passed on the implementation head before this
+  evidence-only documentation amend.
+- **Review:** `codex review --base master` was attempted twice but stopped
+  before analysis because the OpenAI API returned HTTP 401. Immutable manual
+  review removed an empty lifecycle override and replaced optional-string
+  equality with explicit legacy-compatible profile binding; no issues remain.
+- Root profile image callbacks are weakly captured, generation-bound,
+  selected-profile-bound, and cancelled when hidden.
+
+
 ## 2026-06-26 03:58 PDT
 
 - **Priority:** P1 asynchronous account and UI lifecycle correctness.
