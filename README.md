@@ -200,6 +200,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   tweet callback ownership and detached-card invalidation.
 - See `docs/plans/2026-06-26-person-profile-image-lifecycle.md` for current-user
   profile image cancellation, weak captures, and account identity checks.
+- See `docs/plans/2026-06-27-root-profile-image-lifecycle.md` for root profile
+  image cancellation, weak captures, and selected-profile identity checks.
 
 ## Contributing
 

@@ -49,6 +49,8 @@ Helpful reports include:
   network work in cancellable URLSession tasks off the main operation queue.
 - Reused saved-profile cells cancel obsolete image tasks and reject stale
   completions.
+- Root profile image callbacks are weakly captured, generation-bound,
+  selected-profile-bound, and cancelled when hidden.
 - Reused saved-profile cells remove owned overlays before reconfiguration.
 - Saved-profile selection validates table identity before opening Twitter.
 - Saved-profile writes persist before publishing success. A missing Core Data
